@@ -1,0 +1,2 @@
+# aszalo
+Aszaló alfa verzió
