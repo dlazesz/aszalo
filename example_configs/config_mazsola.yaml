@@ -1,0 +1,91 @@
+title: Mazsola aszaló
+database_name: mazsola_filtered_5.sqlite3
+exluded_tables: {'mazsola'}
+exluded_columns: {'sent'}
+displayed_column_table_name: mazsola
+displayed_column_name: sent
+
+default:
+    # friendly_name
+    table_name: mazsola
+    col_name: verbstem
+    fn_value: ''
+    all_featelems: []
+    featelems_aliases:
+        alany : NOM
+        tárgy : ACC
+        részes : DAT
+        birtokos : DAT
+        alanyeset : NOM
+        tárgyeset : ACC
+        részeseset : DAT
+        birtokoseset : DAT
+        "0" : NOM
+        "-t" : ACC
+        "-nAk": DAT
+        "-bA" : ILL
+        "-bAn" : INE
+        "-bÓl" : ELA
+        "-hOz" : ALL
+        "-nÁl" : ADE
+        "-tÓl" : ABL
+        "-rA" : SUB
+        "-On" : SUP
+        "-rÓl" : DEL
+        "-vAl" : INS
+        "-vÁ" : FAC
+        "-ként" : FOR
+        "-kor" : TEM
+        "-ért" : CAU
+        "-ig" : TER
+        "-stUl" : SOC
+        "-Ul": ESS
+    fn_not: false
+    fn_regex: false
+    # api_name
+    value: ''
+    all_elems: []
+    not: false
+    regex: false
+    sort_key: false
+
+fields:
+    - friendly_name: Igető
+      col_name: verbstem
+      api_name: verbstem
+      sort_key: true
+
+    - friendly_name: Argumentum 1
+      table_name: null
+      col_name: argstem
+      api_name: arg1
+
+    - friendly_name: Argumentum 2
+      table_name: null
+      col_name: argstem
+      api_name: arg2
+
+    - friendly_name: Argumentum 3
+      table_name: null
+      col_name: argstem
+      api_name: arg3
+
+    - friendly_name: Szó/kifejezés
+      col_name: sent
+      api_name: sent
+      regex: true
+
+ui-strings:
+    locale: hu_HU.UTF-8
+    submit: Küldés
+    reset: Visszaállítás (a legutolsó paraméterekre)
+    footer: Adatbázis:\ Sass Bálint – <a href="http://corpus.nytud.hu/isz">28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet</a><br>
+            Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
+            Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>
+            <br><br>
+            Hibajelentés:\ <a href="https://bit.ly/aszalohibajelento">https://bit.ly/aszalohibajelento</a><br>
+            <br>
+            <p>Az adatbázis felhasználása esetén az alábbi publikáció hivatkozandó:</p>
+            <ul>
+                <li><a href="http://corpus.nytud.hu/isz/">Sass Bálint:\ 28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet. In:\ Tanács Attila, Varga Viktor, Vincze Veronika (szerk.):\ MSZNY 2015, XI. Magyar Számítógépes Nyelvészeti Konferencia, SZTE, Szeged, 2015, 303-308.</a></li>
+            </ul>

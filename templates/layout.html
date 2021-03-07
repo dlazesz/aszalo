@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="hu">
+    <head>
+        <title>{{title}}</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        <form action="" method="get">
+        {%- for elem in formelems %}
+            <input type="radio" {{ elem.sort_key }} id="{{ elem.api_name }}RADIO" name="sort" value="{{ elem.api_name }}">
+            <label for="{{ elem.api_name }}RADIO" style="display: inline-block; width: 20ch;">{{ elem.friendly_name }}:</label>
+            <label for="{{ elem.api_name }}NOT">NOT</label>
+                <input type="checkbox" {{ elem.not }} id="{{ elem.api_name }}NOT" name="{{ elem.api_name }}NOT" value="{{ elem.api_name }}NOT">
+                <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" size="20">
+                    <datalist id="{{ elem.api_name }}OPTS">
+                    {%- for opt in elem.all_elems %}
+                        <option value="{{ opt }}">
+                    {%- endfor %}
+                    </datalist>
+            <label for="{{ elem.api_name }}REGEX">Regex</label>
+                <input type="checkbox" {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX">
+            {% if not elem.simple_input %}
+            | <label for="{{ elem.api_name }}NOT">NOT</label>
+                <input type="checkbox" {{ elem.fn_not }} id="{{ elem.api_name }}FEATNAME_NOT" name="{{ elem.api_name }}FEATNAME_NOT" value="{{ elem.api_name }}FEATNAME_NOT">
+                <input list="{{ elem.api_name }}FEATOPTS" id="{{ elem.api_name }}FEATNAME" name="{{ elem.api_name }}FEATNAME" value="{{ elem.fn_value }}" size="20">
+                    <datalist id="{{ elem.api_name }}FEATOPTS">
+                    {%- for opt in elem.all_featelems %}
+                        <option value="{{ opt }}">
+                    {%- endfor %}
+                    </datalist>
+            <label for="{{ elem.api_name }}FEATNAME_REGEX">Regex</label>
+                <input type="checkbox" {{ elem.fn_regex }} id="{{ elem.api_name }}FEATNAME_REGEX" name="{{ elem.api_name }}FEATNAME_REGEX" value="{{ elem.api_name }}FEATNAME_REGEX">
+            {% endif %}
+
+            <br>
+        {%- endfor %}
+            <br>
+            <input type="submit" value="{{ ui_strings.submit }}">
+            <input type="reset" value="{{ ui_strings.reset }}">
+        </form>
+        <br><br>
+        {% if count > 0 %}
+         {{count}} találat
+        {% endif %}
+        <br><br>
+        <div>
+        {%- for key, freq, page, link, font_size in freq %}
+            {% if link %}
+            <a style="font-size: {{- font_size }}%" href="#{{ key }}">{{ key }}</a> [{{ freq }}]
+            {% else %}
+            <a style="color:black;font-size: {{- font_size }}%" href="{{ full_url }}&page={{ page }}#{{ key }}">{{ key }}</a> [{{ freq }}]
+            {% endif %}
+        {%- endfor %}
+        </div>
+        <br><br>
+        {%- for key in result %}
+            <strong id="{{ key }}">{{ key }}</strong> <br><br>
+            {%- for id, res_value in result[key] %}
+                <strong style="color:#808080; text-align: right; display: inline-block; width: 10ch;">{{ id }}</strong> {{ res_value }} <br>
+            {%- endfor %}
+            <br><br>
+        {%- endfor %}
+        <br><br>
+        <hr>
+        {{ ui_strings.footer|safe }}
+    </body>
+</html>

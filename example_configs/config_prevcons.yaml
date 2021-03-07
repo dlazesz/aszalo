@@ -1,0 +1,97 @@
+title: PrevCons aszaló
+database_name: PrevCons.sqlite3
+displayed_column_table_name: prevcons
+displayed_column_name: clause
+default:
+    # friendly_name
+    table_name: prevcons
+    fn_value: ''
+    all_featelems: []
+    fn_not: false
+    fn_regex: false
+    # api_name
+    value: ''
+    all_elems: []
+    not: false
+    regex: false
+    sort_key: false
+
+fields:
+    - friendly_name: igekötő
+      col_name: prev
+      api_name: prev
+      sort_key: true
+
+    - friendly_name: igelemma
+      col_name: verb
+      api_name: verb
+
+    - friendly_name: szóalak
+      col_name: actform
+      api_name: actform
+
+    - friendly_name: vonzatkeret
+      col_name: argframe
+      api_name: argframe
+
+    - friendly_name: igekötő produktivitása
+      col_name: prev_prod
+      api_name: prev_prod
+
+    - friendly_name: igekötő hapaxai (db)
+      col_name: prev_hapaxes
+      api_name: prev_hapaxes
+
+    - friendly_name: igealkotási mód
+      col_name: prev_hapaxes
+      api_name: prev_hapaxes
+
+    - friendly_name: a képző/h.séma típusa
+      col_name: suffixtype
+      api_name: suffixtype
+
+    - friendly_name: CV-séma
+      col_name: phonotype
+      api_name: phonotype
+
+    - friendly_name: stílusregiszter
+      col_name: style
+      api_name: style
+
+    - friendly_name: régió
+      col_name: region
+      api_name: region
+
+    - friendly_name: word2vec bemenet
+      col_name: w2v_input
+      api_name: w2v_input
+
+    - friendly_name: word2vec klaszter
+      col_name: w2v_cluster
+      api_name: w2v_cluster
+
+    - friendly_name: tagmondat
+      col_name: clause
+      api_name: clause
+      regex: true
+
+    - friendly_name: teljes mondat
+      col_name: sent
+      api_name: sent
+      regex: true
+
+ui-strings:
+    locale: hu_HU.UTF-8
+    submit: Küldés
+    reset: Visszaállítás (a legutolsó paraméterekre)
+    footer: Adatbázis:\ Kalivoda Ágnes – <a href="https://github.com/kagnes/prevcons">PrevCons</a><br>
+            Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
+            Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>
+            <br><br>
+            Hibajelentés:\ <a href="https://bit.ly/aszalohibajelento">https://bit.ly/aszalohibajelento</a><br>
+            <br>
+            <p>A PrevCons felhasználása esetén az alábbi publikációk egyike hivatkozandó:</p>
+            <ul>
+                <li><a href="https://doi.org/10.34103/ARGUMENTUM/2021/4">Kalivoda Ágnes (2021). Az igekötők produktív kapcsolódási mintái. Argumentum 17. p. 56-82. https://doi.org/10.34103/ARGUMENTUM/2021/4</a></li>
+                <li><a href="https://github.com/kagnes/phd_thesis">Kalivoda Ágnes (2021). Igekötős szerkezetek a magyarban. Doktori értekezés. PPKE BTK, Nyelvtudományi Doktori Iskola. Budapest. Megjelenés alatt.</a></li>
+            </ul>

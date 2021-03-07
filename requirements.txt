@@ -1,0 +1,8 @@
+sqlalchemy
+flask
+flask_sqlalchemy
+flask_httpauth
+werkzeug
+jinja2
+gunicorn
+yamale

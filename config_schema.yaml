@@ -1,0 +1,32 @@
+title: str(min=1, required=False, none=False)
+database_name: str(min=1, required=False, none=False)
+exluded_tables: set( required=False, none=False)
+exluded_columns: set( required=False, none=False)
+displayed_column_table_name: str(min=1, required=False, none=False)
+displayed_column_name: str(min=1, required=False, none=False)
+
+ui-strings:
+    locale: str(required=True, none=False)
+    submit: str(required=True, none=False)
+    reset: str(required=True, none=False)
+    footer: str(required=False, none=False)
+
+
+default: include('form_field')
+fields: list(include('form_field'))
+---
+form_field:
+    friendly_name: str(required=False, none=False)
+    table_name: str(required=False, none=True)
+    col_name: str(required=False, none=False)
+    fn_value: str(required=False, none=False)
+    all_featelems: list(str(required=False, none=False), required=False)
+    featelems_aliases: map(str(required=False, none=False), key=str(required=False, none=False), required=False)
+    fn_not: bool(required=False)
+    fn_regex: bool(required=False)
+    api_name: str(required=False, none=False)
+    value: str(required=False, none=False)
+    all_elems: list(str(required=False, none=False), required=False)
+    not: bool(required=False)
+    regex: bool(required=False)
+    sort_key: bool(required=False)
