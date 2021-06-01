@@ -79,16 +79,16 @@ def read_config(conf_file):
         nf.update(field)
 
         if len(nf.keys()) != 11:
-            ValueError(f'Some attributes are missing for field {nf}')
+            raise ValueError(f'Some attributes are missing for field {nf}')
 
         # Check for valid regexes
         if nf['regex'] and len(nf['value']) > 0 and valid_re_or_none(nf['value']) is None:
-            ValueError('value attribute for {0} is not valid regex!'.format(nf['api_name']))
+            raise ValueError('value attribute for {0} is not valid regex!'.format(nf['api_name']))
 
         # Check for valid regexes
         if nf['fn_regex'] and nf['fn_value'] is not None and len(nf['fn_value']) > 0 and \
                 valid_re_or_none(nf['value']) is None:
-            ValueError('fn_value attribute for {0} is not valid regex!'.format(nf['api_name']))
+            raise ValueError('fn_value attribute for {0} is not valid regex!'.format(nf['api_name']))
 
         # To be able to distinguish simple fields from complex ones
         simple_input = nf['table_name'] is not None
@@ -106,12 +106,12 @@ def read_config(conf_file):
 
     # Unique API name
     if len({field['api_name'] for field in new_fields}) < len(new_fields):
-        ValueError('api_name attribute must be unique!')
+        raise ValueError('api_name attribute must be unique!')
 
     # Exactly one sort key
     sort_keys = [field['api_name'] for field in new_fields if len(field['sort_key']) > 0]
     if len(sort_keys) != 1:
-        ValueError('Configuration need exactly one sort_key!')
+        raise ValueError('Configuration need exactly one sort_key!')
     config['default_sort_key'] = sort_keys[0]
 
     config['fields'] = new_fields
@@ -142,8 +142,8 @@ def aditional_init_from_database(settings, table_objs, session):
             inp_field['all_featelems'] = list(inp_field['featelems_aliases'].keys()) + selectable_tables_list
             invalid_alias_value = set(inp_field['featelems_aliases'].values()) - selectable_tables
             if len(invalid_alias_value) > 0:
-                ValueError('Some values in featelems_aliases ({0}) points to invalid table names!'.
-                           format(invalid_alias_value))
+                raise ValueError(f'Some values in featelems_aliases ({invalid_alias_value}) points to invalid table'
+                                 f' names!')
         else:
             inp_field['all_featelems'] = selectable_tables_list
             table_name = next(iter(inp_field['table_name']))

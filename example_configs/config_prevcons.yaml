@@ -43,8 +43,8 @@ fields:
       api_name: prev_hapaxes
 
     - friendly_name: igealkotási mód
-      col_name: prev_hapaxes
-      api_name: prev_hapaxes
+      col_name: inputtype
+      api_name: inputtype
 
     - friendly_name: a képző/h.séma típusa
       col_name: suffixtype
