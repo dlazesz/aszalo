@@ -20,10 +20,14 @@ class Set(Validator):
         return isinstance(value, dict) and set(value.values()) == {None}
 
 
-validators = DefaultValidators.copy()  # This is a dictionary
-validators[Set.tag] = Set
-config_schema = make_schema(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config_schema.yaml'),
-                            validators=validators)
+def load_schema():
+    validators = DefaultValidators.copy()  # This is a dictionary
+    validators[Set.tag] = Set
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config_schema.yaml'), encoding='UTF-8') as fh:
+        schemafile_content = fh.read()
+    config_schema = make_schema(content=schemafile_content, validators=validators)
+
+    return config_schema
 
 
 def valid_re_or_none(re_str):
@@ -35,7 +39,9 @@ def valid_re_or_none(re_str):
 
 
 def load_and_validate(schema, fname, strict=True):
-    data = make_data(fname)
+    with open(fname, encoding='UTF-8') as data_fh:
+        data_content = data_fh.read()
+    data = make_data(content=data_content)
     try:
         validate(schema, data, strict)
     except YamaleError as e:
@@ -48,18 +54,8 @@ def load_and_validate(schema, fname, strict=True):
 
 
 def read_config(conf_file):
-    """
-    import yamale
 
-    site_schema = yamale.make_schema(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'site_schema.yaml'))
-    crawl_schema = yamale.make_schema(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'crawl_schema.yaml'))
-    config = load_and_validate(crawl_schema, current_task_config_filename)
-
-    with open(conf_file, 'rb') as fh:
-        config = yaml_load(fh, Loader=yaml_SafeLoader)
-
-    """
-
+    config_schema = load_schema()
     config = load_and_validate(config_schema, conf_file)
     setlocale(LC_ALL, config['ui-strings']['locale'])
     # Escape string for HTML
