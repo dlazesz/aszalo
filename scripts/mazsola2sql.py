@@ -148,8 +148,8 @@ def mazsola2sql(in_file, out_db, filter_entries=True, rare_arg_threshold=5, chun
     with engine.connect() as conn:
         for i, batch in enumerate(chunked_iterator(gen_mazsola_dict(other_tables, mazsola_final), chunksize), start=1):
             with conn.begin():
-                for main_tabel_vals, arg_tables in batch:
-                    row = conn.execute(mazsola_table.insert(), main_tabel_vals)  # Instert sentence
+                for main_table_vals, arg_tables in batch:
+                    row = conn.execute(mazsola_table.insert(), main_table_vals)  # Instert sentence
                     for other_table_name, val in arg_tables.items():  # Insert args to their table
                         conn.execute(other_table_name.insert(), {'id': row.inserted_primary_key[0], 'argstem': val})
             print(i*chunksize, flush=True)
