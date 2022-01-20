@@ -6,15 +6,14 @@ default:
     # friendly_name
     table_name: prevcons
     fn_value: ''
-    all_featelems: []
     fn_not: false
     fn_regex: false
     # api_name
     value: ''
-    all_elems: []
     not: false
     regex: false
     sort_key: false
+    featelems_aliases: {}
 
 fields:
     - friendly_name: igekötő

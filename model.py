@@ -38,7 +38,7 @@ def cond_to_sql(table_name, col_name, form_val, is_not, is_regex):
     # IS NULL is automatically handled by SQLAlchemy
     cond_part = table_column_objs[(table_name, col_name)] == form_val
     if is_regex:
-        cond_part = table_column_objs[(table_name, col_name)].op('regexp')(form_val)
+        cond_part = table_column_objs[(table_name, col_name)].regexp_match(form_val)
     if is_not:
         cond_part = not_(cond_part)
     return cond_part

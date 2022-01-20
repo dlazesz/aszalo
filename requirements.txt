@@ -1,4 +1,4 @@
-sqlalchemy
+sqlalchemy>=1.4.0
 flask
 flask_sqlalchemy
 flask_httpauth

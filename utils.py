@@ -2,11 +2,9 @@
 # -*- coding: utf-8, vim: expandtab:ts=4 -*-
 
 import os
-from re import compile as re_compile
 
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy, inspect
-from sqlalchemy.event import listens_for
 from sqlalchemy import Table, MetaData
 
 from flask_httpauth import HTTPBasicAuth
@@ -24,18 +22,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.config['JSON_AS_ASCII'] = False
 db = SQLAlchemy(app)
-
-
-# Register regex parameter for engine
-def re_fn(expr, item):
-    reg = re_compile(expr)
-    return item is not None and reg.search(item) is not None
-
-
-@listens_for(db.engine, 'begin')
-def do_begin(conn):
-    conn.connection.create_function('regexp', 2, re_fn)
-
 
 # All tables imported automatically, but we need to create a mapping from names to objects to use them easily
 table_objs = {table_name: Table(table_name, MetaData(), autoload_with=db.engine)

@@ -13,6 +13,7 @@ default:
     not: false
     regex: false
     sort_key: false
+    featelems_aliases: {}
 
 fields:
     - friendly_name: igekötő

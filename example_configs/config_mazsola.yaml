@@ -10,7 +10,6 @@ default:
     table_name: mazsola
     col_name: verbstem
     fn_value: ''
-    all_featelems: []
     featelems_aliases:
         alany : NOM
         tárgy : ACC
@@ -44,7 +43,6 @@ default:
     fn_regex: false
     # api_name
     value: ''
-    all_elems: []
     not: false
     regex: false
     sort_key: false

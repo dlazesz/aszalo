@@ -287,7 +287,7 @@ def render_result(state, count, out, res, base_url, full_url, out_format='HTML',
     # https://stackoverflow.com/questions/7734569/how-do-i-remove-a-query-string-from-url-using-python/7734686#7734686
     full_url = urlparse(full_url)
     query = parse_qs(full_url.query, keep_blank_values=True)
-    query.pop('page', None)
+    query.pop(b'page', None)
     full_url = full_url._replace(query=urlencode(query, True), fragment='')
     full_url = urlunparse(full_url)
 

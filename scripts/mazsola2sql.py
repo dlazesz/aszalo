@@ -153,6 +153,8 @@ def mazsola2sql(in_file, out_db, filter_entries=True, rare_arg_threshold=5, chun
                     for other_table_name, val in arg_tables.items():  # Insert args to their table
                         conn.execute(other_table_name.insert(), {'id': row.inserted_primary_key[0], 'argstem': val})
             print(i*chunksize, flush=True)
+        print('VACUUM-ing...', flush=True)
+        conn.execute('VACUUM;')
 
 
 def check_positive(value):
@@ -175,7 +177,7 @@ def parse_args():
                         help='Output SQLite filename (mazsola.sqlite3)', metavar='FILE')
     parser.add_argument('-f', '--filter', dest='filter', action='store_true',
                         help='Filter Mazsola or not (default: true)')
-    parser.add_argument('-t', '--threshold', dest='threshold', type=check_positive, metavar='NUM',
+    parser.add_argument('-t', '--threshold', dest='threshold', type=check_positive, metavar='NUM', default=5,
                         help='If any argument in entry occurs less then threshold the entry will be discarded')
     options = vars(parser.parse_args())
 
