@@ -10,7 +10,19 @@ from flask import request, flash
 
 from model import query
 from utils import app, auth, InvalidUsage, str2bool, settings
-from view import parse_view, render_result
+from view import parse_view, render_result, parse_filter, render_filter
+
+
+@app.route('/filter')
+def filter_field():
+    return main_filter(request.args)
+
+
+def main_filter(input_args):
+    ret_val, status_code = parse_filter(input_args)
+    result_json = render_filter(ret_val)
+    result = app.response_class(response=result_json, status=status_code, mimetype='application/json')
+    return result
 
 
 @app.route('/')  # So one can create permalink for searches!

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8, vim: expandtab:ts=4 -*-
 
+from re import escape as re_escape
 from json import dumps as json_dumps
 from copy import deepcopy
 from itertools import chain
@@ -219,10 +220,9 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
 
     # Parse feature table regex, and add matching tables or just add the single literal table when regex is not checked
     if len(field_state['fn_regex']) > 0:
-        fn_value_regex = valid_re_or_none(field_state['fn_value'])
-        if fn_value_regex is not None:
-            # Add matching tablenames
-            fn_value = {value for value in field_state['all_featelems'] if fn_value_regex.search(value) is not None}
+        fn_value = _grep_value_in_seq(field_state['fn_value'], field_state['all_featelems'])
+        if fn_value is not None:
+            fn_value = set(fn_value)
         else:  # Invalid regex, ignore field
             raise InvalidUsage('Feature name value ({0}) is invalid regular expression at \'{1}\' ({2}FEATNAME)!'.
                                format(field_state['fn_value'], field_state['friendly_name'], field_state['api_name']),
@@ -282,6 +282,19 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
                   frozenset(not_tables)))
 
 
+def _grep_value_in_seq(value, all_elems, like=False):
+    # Prefix search (like == True) or full-text search (like == False)
+    if like:  # Like SQL LIKE STRING%
+        value = re_escape(value)
+        value = f'^{value}'
+    value_regex = valid_re_or_none(value)
+    if value_regex is not None:
+        # Add matching tablenames
+        value_regex = [value for value in all_elems if value_regex.search(value) is not None]
+
+    return value_regex
+
+
 def render_result(state, count, out, res, base_url, full_url, out_format='HTML', debug=False):
     # Recipe from:
     # https://stackoverflow.com/questions/7734569/how-do-i-remove-a-query-string-from-url-using-python/7734686#7734686
@@ -320,3 +333,53 @@ def checked_or_empty(val, input_field_present, default):
             (val is None and not input_field_present and len(default) > 0):
         return 'checked'
     return ''
+
+
+def parse_filter(request_args):
+    api_name = request_args.get('api_name')
+    for field in settings['fields']:
+        if field['api_name'] == api_name:
+            curr_field = field
+            break
+    else:
+        return {'error': f'No field named {api_name} !'}, 400
+
+    if curr_field['simple_input']:
+        value_name = 'value'
+        regex_val_name = f'{api_name}REGEX'
+        all_elems = curr_field['all_elems']
+    else:
+        value_name = f'{api_name}FEATNAME'
+        regex_val_name = f'{api_name}FEATNAME_REGEX'
+        all_elems = curr_field['all_featelems']
+
+    value = request_args.get(value_name, '')
+    if len(value) == 0:
+        return {'error': f'{value_name} ({value}) is empty for field {api_name} !'}, 400
+    regex_val = request_args.get(regex_val_name, default=False, type=lambda v: v.lower() == 'true')
+    max_len = request_args.get('limit', default=40)
+
+    try:
+        max_len_int = int(max_len)
+    except ValueError:
+        max_len_int = -1
+
+    if max_len_int <= 1:
+        return {'error': f'Value ({max_len}) is invalid integer for limit !'}, 400
+
+    ret = _grep_value_in_seq(value, all_elems, not regex_val)
+
+    if ret is None:
+        return {'error': f'Value ({value}) is invalid regular expression for field {value_name} !'}, 400
+
+    return {'values': ret[:max_len_int], 'more_elems_length': max(0, len(ret)-max_len_int)}, 200
+
+
+def render_filter(res):
+    if 'values' in res and 'more_elems_length' in res:
+        n = res['more_elems_length']
+        n_more_elems = settings['ui-strings']['n_more_elems'].format(n)
+        if len(res['values']) > 0 and res['values'][-1] != n_more_elems and n > 0:
+            res['values'].append(n_more_elems)
+    ret = json_dumps(res, ensure_ascii=False, indent=4)
+    return ret

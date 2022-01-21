@@ -77,6 +77,7 @@ ui-strings:
     locale: hu_HU.UTF-8
     submit: Küldés
     reset: Visszaállítás (a legutolsó paraméterekre)
+    n_more_elems: "{0} további találat nem került megjelenítésre"
     footer: Adatbázis:\ Sass Bálint – <a href="http://corpus.nytud.hu/isz">28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet</a><br>
             Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
             Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>

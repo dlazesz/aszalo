@@ -10,6 +10,7 @@ ui-strings:
     submit: str(required=True, none=False)
     reset: str(required=True, none=False)
     footer: str(required=False, none=False)
+    n_more_elems: str(required=True, none=False)
 
 
 default: include('form_field')
