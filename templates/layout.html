@@ -3,6 +3,77 @@
     <head>
         <title>{{title}}</title>
         <meta charset="utf-8">
+        <script>
+        {%- for elem in formelems %}
+            function {{ elem.api_name }}_change() {
+                var {{ elem.api_name }}_request_url = new URL(window.location.href.split('?')[0] + '/filter');
+            {% if elem.simple_input %}
+                // Get the <datalist> and <input> elements.
+                var {{ elem.api_name }}_dataList = document.getElementById('{{ elem.api_name }}OPTS');
+                var {{ elem.api_name }}_input = document.getElementById('{{ elem.api_name }}');
+                {{ elem.api_name }}_request_url.searchParams.append('value', {{ elem.api_name }}_input.value);
+                {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}REGEX', document.getElementById('{{ elem.api_name }}REGEX').checked);
+            {% else %}
+                // Get the <datalist> and <input> elements.
+                var {{ elem.api_name }}_dataList = document.getElementById('{{ elem.api_name }}FEATOPTS');
+                var {{ elem.api_name }}_input = document.getElementById('{{ elem.api_name }}FEATNAME');
+                {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}FEATNAME', {{ elem.api_name }}_input.value);
+                {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}FEATNAME_REGEX', document.getElementById('{{ elem.api_name }}FEATNAME_REGEX').checked);
+            {% endif %}
+                var {{ elem.api_name }}_limit = 40;  // TODO wire-out!
+                {{ elem.api_name }}_request_url.searchParams.append('api_name', '{{ elem.api_name }}');
+                {{ elem.api_name }}_request_url.searchParams.append('limit', {{ elem.api_name }}_limit);
+
+                // Create a new XMLHttpRequest.
+                var {{ elem.api_name }}_request = new XMLHttpRequest();
+
+                // Handle state changes for the request.
+                {{ elem.api_name }}_request.onreadystatechange = function (response) {
+                    if ({{ elem.api_name }}_request.readyState === 4) {
+                        if ({{ elem.api_name }}_request.status === 200) {
+                            {{ elem.api_name }}_dataList.innerHTML = '';
+                            // Parse the JSON
+                            var jsonOptions = JSON.parse({{ elem.api_name }}_request.responseText)['values'];
+
+                            // Loop over the JSON array.
+                            jsonOptions.forEach(function (item, i) {
+
+                                // Create a new <option> element.
+                                var option = document.createElement('option');
+                                if (i < jsonOptions.length -1 || jsonOptions.length < {{ elem.api_name }}_limit ) {
+
+                                    // Set the value using the item in the JSON array.
+                                    option.value = item;
+                                } else {
+
+                                    // Set the value using the value typed into the input.
+                                    option.value = ' '; // {{ elem.api_name }}_input.value;
+                                    option.setAttribute('readonly', true);
+                                }
+                                option.innerHTML = item;
+
+                                // Add the <option> element to the <datalist>.
+                                {{ elem.api_name }}_dataList.appendChild(option);
+                            });
+                        } else {
+                            // An error occured :(
+                            {{ elem.api_name }}_input.placeholder = JSON.parse({{ elem.api_name }}_request.responseText)['error'];
+                        }
+                    }
+                };
+                if ({{ elem.api_name }}_input.value.length > 0) {
+                    // Update the placeholder text.
+                    // {{ elem.api_name }}_input.placeholder = 'Loading options...';  // TODO wire-out
+
+                    // Set up and make the request.
+                    {{ elem.api_name }}_request.open('GET', {{ elem.api_name }}_request_url, true);
+                    {{ elem.api_name }}_request.send();
+                } else {
+                    {{ elem.api_name }}_dataList.innerHTML = '';
+                }
+            }
+        {%- endfor %}
+        </script>
     </head>
     <body>
         {% with messages = get_flashed_messages() %}
@@ -20,25 +91,17 @@
             <label for="{{ elem.api_name }}RADIO" style="display: inline-block; width: 20ch;">{{ elem.friendly_name }}:</label>
             <label for="{{ elem.api_name }}NOT">NOT</label>
                 <input type="checkbox" {{ elem.not }} id="{{ elem.api_name }}NOT" name="{{ elem.api_name }}NOT" value="{{ elem.api_name }}NOT">
-                <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" size="20">
-                    <datalist id="{{ elem.api_name }}OPTS">
-                    {%- for opt in elem.all_elems %}
-                        <option value="{{ opt }}">
-                    {%- endfor %}
-                    </datalist>
+                <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" {%- if elem.simple_input -%}oninput="{{ elem.api_name }}_change()"{% endif %} size="20">
+                    <datalist id="{{ elem.api_name }}OPTS"></datalist>
             <label for="{{ elem.api_name }}REGEX">Regex</label>
-                <input type="checkbox" {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX">
+                <input type="checkbox" {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX" {%- if elem.simple_input -%}onchange="{{ elem.api_name }}_change()"{% endif %}>
             {% if not elem.simple_input %}
             | <label for="{{ elem.api_name }}NOT">NOT</label>
                 <input type="checkbox" {{ elem.fn_not }} id="{{ elem.api_name }}FEATNAME_NOT" name="{{ elem.api_name }}FEATNAME_NOT" value="{{ elem.api_name }}FEATNAME_NOT">
-                <input list="{{ elem.api_name }}FEATOPTS" id="{{ elem.api_name }}FEATNAME" name="{{ elem.api_name }}FEATNAME" value="{{ elem.fn_value }}" size="20">
-                    <datalist id="{{ elem.api_name }}FEATOPTS">
-                    {%- for opt in elem.all_featelems %}
-                        <option value="{{ opt }}">
-                    {%- endfor %}
-                    </datalist>
+                <input list="{{ elem.api_name }}FEATOPTS" id="{{ elem.api_name }}FEATNAME" name="{{ elem.api_name }}FEATNAME" value="{{ elem.fn_value }}" oninput="{{ elem.api_name }}_change()" size="20">
+                    <datalist id="{{ elem.api_name }}FEATOPTS"></datalist>
             <label for="{{ elem.api_name }}FEATNAME_REGEX">Regex</label>
-                <input type="checkbox" {{ elem.fn_regex }} id="{{ elem.api_name }}FEATNAME_REGEX" name="{{ elem.api_name }}FEATNAME_REGEX" value="{{ elem.api_name }}FEATNAME_REGEX">
+                <input type="checkbox" {{ elem.fn_regex }} id="{{ elem.api_name }}FEATNAME_REGEX" name="{{ elem.api_name }}FEATNAME_REGEX" value="{{ elem.api_name }}FEATNAME_REGEX" onchange="{{ elem.api_name }}_change()">
             {% endif %}
 
             <br>
