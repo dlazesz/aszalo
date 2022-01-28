@@ -68,6 +68,10 @@ fields:
       col_name: argstem
       api_name: arg3
 
+    - friendly_name: Keret
+      col_name: frame
+      api_name: frame
+
     - friendly_name: Szó/kifejezés
       col_name: sent
       api_name: sent

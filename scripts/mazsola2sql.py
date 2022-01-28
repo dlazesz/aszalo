@@ -95,7 +95,8 @@ def create_tables(engine, metadata, arg_cases):
     mazsola_table = Table('mazsola', metadata,
                           Column('id', Integer, primary_key=True),
                           Column('sent', String),
-                          Column('verbstem', String, index=True))
+                          Column('verbstem', String, index=True),
+                          Column('frame', String, index=True))
 
     other_tables = {case: Table(case, metadata,
                                 Column('id', Integer, ForeignKey('mazsola.id'), index=True),
@@ -117,8 +118,10 @@ def gen_mazsola_dict(arg_tables, mazsola):
             else:
                 new_args[case] = val
 
-        yield {'sent': sent, 'verbstem': new_args['STEM']}, {arg_tables[case]: val for case, val in new_args.items()
-                                                             if case != 'STEM'}
+        frame = ' '.join(sorted(case for case in new_args.keys() if case != 'STEM'))
+
+        yield ({'sent': sent, 'verbstem': new_args['STEM'], 'frame': frame},
+               {arg_tables[case]: val for case, val in new_args.items() if case != 'STEM'})
 
 
 def chunked_iterator(iterable, n):
