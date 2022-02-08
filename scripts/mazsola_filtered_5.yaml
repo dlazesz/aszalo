@@ -1,0 +1,147 @@
+default:
+    # The name of the column in the input TSV
+    # column_name: ...
+    # Main table name (can be the only table if all column reside in one table or set/overwritten if separate is true)
+    # table_name: mazsola
+    # Unified column name for separate tables or unique name for main table (id as value is not allowed!)
+    sql_column_name: argstem
+    # Type for SQL in Python format
+    column_type: str
+    # Create index for column in the SQL or not
+    index: true
+    # Column belongs to the main table or to a separate table? (set/overwrite table_name if true)
+    separate: true
+
+columns:
+    - column_name: STEM
+      table_name: mazsola
+      sql_column_name: stem
+      index: true
+      separate: false
+    - column_name: frame
+      table_name: mazsola
+      sql_column_name: frame
+      index: true
+      separate: false
+    - column_name: sent
+      table_name: mazsola
+      sql_column_name: sent
+      index: false
+      separate: false
+    # Columns in separate tables, indexed
+    - column_name: ABL
+    - column_name: ACC
+    - column_name: ADE
+    - column_name: ALATT
+    - column_name: ALL
+    - column_name: ALUL
+    - column_name: ALUL-FELÜL
+    - column_name: ALÁ
+    - column_name: ALÓL
+    - column_name: BELÜL
+    - column_name: BELŐL
+    - column_name: BÉVÜL
+    - column_name: CAU
+    - column_name: DACÁRA
+    - column_name: DAT
+    - column_name: DEL
+    - column_name: EGYÜTT
+    - column_name: ELA
+    - column_name: ELIBE
+    - column_name: ELIBÉ
+    - column_name: ELLEN
+    - column_name: ELLENÉRE
+    - column_name: ELÉ
+    - column_name: ELÉBE
+    - column_name: ELŐL
+    - column_name: ELŐTT
+    - column_name: ESS
+    - column_name: EZ-ELŐTT
+    - column_name: FAC
+    - column_name: FELE
+    - column_name: FELE-FELE
+    - column_name: FELETT
+    - column_name: FELIBE
+    - column_name: FELÉ
+    - column_name: FELÜL
+    - column_name: FELÜLRE
+    - column_name: FELÜLRŐL
+    - column_name: FELŐL
+    - column_name: FOGVA
+    - column_name: FOGVÁST
+    - column_name: FOK
+    - column_name: FOLYTÁN
+    - column_name: FOR
+    - column_name: FÖL-ALÁ
+    - column_name: FÖLÉ
+    - column_name: FÖLÉBE
+    - column_name: FÖLÖTT
+    - column_name: FÖLÜL
+    - column_name: FÖLÜLRŐL
+    - column_name: GYANÁNT
+    - column_name: HELYETT
+    - column_name: HIN
+    - column_name: HOSSZAT
+    - column_name: ILL
+    - column_name: INE
+    - column_name: INF
+    - column_name: INS
+    - column_name: IRÁNT
+    - column_name: KERESZTÜL
+    - column_name: KÉPEST
+    - column_name: KÍVÜL
+    - column_name: KÍVÜL-BELÜL
+    - column_name: KÖRÉ
+    - column_name: KÖRÖTT
+    - column_name: KÖRÖTTI
+    - column_name: KÖRÜL
+    - column_name: KÖRÜLÖTT
+    - column_name: KÖRÜLÖTTI
+    - column_name: KÖVETKEZTÉBEN
+    - column_name: KÖZBEN
+    - column_name: KÖZEL
+    - column_name: KÖZELRE
+    - column_name: KÖZELRŐL
+    - column_name: KÖZELÉBEN
+    - column_name: KÖZIBE
+    - column_name: KÖZT
+    - column_name: KÖZÉ
+    - column_name: KÖZÖT
+    - column_name: KÖZÖTT
+    - column_name: KÖZÜL
+    - column_name: ME3
+    - column_name: MELLETT
+    - column_name: MELLÉ
+    - column_name: MELLŐL
+    - column_name: MENTÉN
+    - column_name: MIALATT
+    - column_name: MIATT
+    - column_name: MIRAJTUNK
+    - column_name: MÖGÉ
+    - column_name: MÖGÖTT
+    - column_name: MÖGÜL
+    - column_name: MÚLTÁN
+    - column_name: MÚLVA
+    - column_name: MÚLVÁN
+    - column_name: NOM
+    - column_name: NÉLKÜL
+    - column_name: PE2
+    - column_name: PE3
+    - column_name: RAJTA
+    - column_name: RÉSZÉRE
+    - column_name: RÉVÉN
+    - column_name: SOC
+    - column_name: SUB
+    - column_name: SUP
+    - column_name: SZEMBEN
+    - column_name: SZERINT
+    - column_name: SZÁMÁRA
+    - column_name: TEM
+    - column_name: TER
+    - column_name: TT3
+    - column_name: TÚL
+    - column_name: UTÁN
+    - column_name: VÉGETT
+    - column_name: ÁLTAL
+    - column_name: ÓTA
+    - column_name: ÚTJÁN

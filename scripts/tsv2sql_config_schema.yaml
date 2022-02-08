@@ -1,0 +1,16 @@
+default: include('db_column')
+columns: list(include('db_column'))
+---
+db_column:
+    # The name of the column in the input TSV
+    column_name: str(required=False, none=True)
+    # Main table name (can be the only table if all column reside in one table or set/overwritten if separate is true)
+    table_name: str(required=False, none=False)
+    # Unified column name for separate tables or unique name for main table (id as value is not allowed!)
+    sql_column_name: str(required=False, none=True)
+    # Type for SQL in Python format
+    column_type: enum('str', 'int', 'float', 'none', required=False, none=False)
+    # Create index for column in the SQL or not
+    index: bool(required=False, none=False)
+    # Column belongs to the main table or to a separate table? (set/overwrite table_name if true)
+    separate: bool(required=False, none=False)

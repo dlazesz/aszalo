@@ -30,8 +30,8 @@ The following sections can be specified:
 
 - `title`: The title of the browser tab
 - `database_name`: The path and name of the SQLite database (relative to `read_config.py`)
-- `exluded_tables` (set): Tables to be exluded from the secondary field values (suggested value: main table if there are multiple tables)
-- `exluded_columns` (set): Columns to be exluded from the primary field values at init time (suggested value: displayed_column_name value)
+- `excluded_tables` (set): Tables to be excluded from the secondary field values (suggested value: main table if there are multiple tables)
+- `excluded_columns` (set): Columns to be excluded from the primary field values at init time (suggested value: displayed_column_name value and any column with very large distinct value set)
 - `displayed_column_table_name`: The name of the table contains column to be displayed (usually sentences or clauses)
 - `displayed_column_name`:  The name of the column to be displayed (usually sentences or clauses)
 - `ui-strings`: The following fixed set of options for text shown on the search interface:
@@ -70,7 +70,36 @@ These extra parameters can be used to modify the displayed results in the query:
 - `limit` (default: 1000): The number of entries to be displayed (rounded up to completely display all entries for the last key)
 - `page` (default: 0): The number of the page to be displayed in the paginated output
 
-# Examples and bundled scripts
+# Your really own database in Aszaló DB schema
+
+1. Create a database in TSV format with a header for field names. If your data is sparse (e.g. verbal frames for grammatical cases) use NULL string for empty elements (and consider using separate tables in the database).
+2. Create a configuration for tsv2sql.py
+3. Run [`tsv2sql.py -i your_database.TSV -o your_database.sqlite3 -c your_configuration.yaml`](scripts/tsv2sql.py)
+4. Profit! :)
+
+The configuration is similar to the one used in [form configuration](#form-configuration) section. There is a default column wich serves as an overlay for the omitted properties for the columns.
+For each column, the following properties are required under the column key in a list:
+
+- `column_name`: The name of the column in the input TSV
+- `table_name`: Main table name (can be the only table if all column reside in one table or set/overwritten if separate is true)
+- `sql_column_name`: Unified column name for separate tables or unique name for main table (id as value is not allowed!)
+- `column_type`: Type for SQL in Python format (`{'str', 'int', 'float', 'none'}` none means that the column is omitted from the database)
+- `index`: Create index for column in the SQL or not
+- `separate`: Column belongs to the main table or to a separate table? (set/overwrite table_name if true)
+
+The list of columns can be in arbitrary order, but must correspond to the TSV file column definitions.
+
+Some general considerations:
+
+- In the case of sparse data it is advised to separate columns into different SQL tables (`separate: true`)
+- It is adviced to create index for columns which contain non-uniq elements and will be exposed to the frontend as it will make the queries faster, but makes the sqlite3 file larger (i.e. reqcomended for everyting, but example sentences)
+- Columns in the TSV can be omitted from the database if not used in the frontend (e.g. `column_type: none`)
+- It is advised to use the proper type for the column, but be avare that using non str type kill the regex option
+- Try with small queries and generalize slowly, as queries can slow down fast if large amout of data needs to be considered
+
+A [conversion script](scripts/mazsola2tsv.py) with [example configuration](scripts/mazsola_filtered_5.yaml) is provided for [Mazsola (Verb Argument Browser)](http://corpus.nytud.hu/mazsola/index_eng.html) as an example
+
+# Examples
 
 There are example configs and scripts bundled to be able to easily start, using the following databases:
 

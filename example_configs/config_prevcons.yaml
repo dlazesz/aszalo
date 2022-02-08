@@ -1,5 +1,7 @@
 title: PrevCons aszaló
 database_name: PrevCons.sqlite3
+excluded_tables: {'prevcons'}
+excluded_columns: {'clause'}
 displayed_column_table_name: prevcons
 displayed_column_name: clause
 default:

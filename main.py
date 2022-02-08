@@ -68,17 +68,10 @@ def execute_query(query_details, limit=1000, offset=0):
         if count > 0:
             out = []
             i = 0
-            for key, freq in out_prev:
-                out.append((key, freq, i//limit, False, lin_scale(log(freq), log(min_freq), log(max_freq))))
-                i += freq
-
-            for key, freq in out_disp:
-                out.append((key, freq, i//limit, True, lin_scale(log(freq), log(min_freq), log(max_freq))))
-                i += freq
-
-            for key, freq in out_next:
-                out.append((key, freq, i//limit, False, lin_scale(log(freq), log(min_freq), log(max_freq))))
-                i += freq
+            for part, is_displayed in ((out_prev, False), (out_disp, True), (out_next, False)):
+                for key, freq in part:
+                    out.append((key, freq, i//limit, is_displayed, lin_scale(log(freq), log(min_freq), log(max_freq))))
+                    i += freq
 
     return count, out, examples
 

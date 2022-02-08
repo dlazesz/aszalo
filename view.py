@@ -37,6 +37,14 @@ def parse_view(request_args):
                                                   field_state['not'])
             field_state['regex'] = checked_or_empty(request_args.get(f'{col_api_name}REGEX'), value_in_request_args,
                                                     field_state['regex'])
+
+            # Regex disabled, still used as parameter
+            if len(field_state['regex_disabled']) > 0 and len(field_state['regex']) > 0:
+                raise InvalidUsage('Regex is disabled for field {0} ({1}) because it is non-sting type,'
+                                   ' but regex parameter is checked for field!'.
+                                   format(field_state['friendly_name'], field_state['api_name']),
+                                   status_code=400)
+
             # 1b. Featname value
             field_state['fn_value'] = request_args.get(f'{col_api_name}FEATNAME', field_state['fn_value'])
             fn_value_in_request_args = f'{col_api_name}FEATNAME' in request_args

@@ -30,7 +30,7 @@ table_column_objs = {(table_name, col_obj.key): col_obj for table_name, table_ob
                      for col_obj in table_obj.columns}
 
 # Settings are updated from the database
-aditional_init_from_database(settings, table_objs, db.session)
+aditional_init_from_database(settings, table_objs, table_column_objs, db.session)
 
 
 # Other ultility functions

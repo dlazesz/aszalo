@@ -94,7 +94,7 @@
                 <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" {%- if elem.simple_input -%}oninput="{{ elem.api_name }}_change()"{% endif %} size="20">
                     <datalist id="{{ elem.api_name }}OPTS"></datalist>
             <label for="{{ elem.api_name }}REGEX">Regex</label>
-                <input type="checkbox" {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX" {%- if elem.simple_input -%}onchange="{{ elem.api_name }}_change()"{% endif %}>
+                <input type="checkbox" {{ elem.regex_disabled }} {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX" {%- if elem.simple_input -%}onchange="{{ elem.api_name }}_change()"{% endif %}>
             {% if not elem.simple_input %}
             | <label for="{{ elem.api_name }}NOT">NOT</label>
                 <input type="checkbox" {{ elem.fn_not }} id="{{ elem.api_name }}FEATNAME_NOT" name="{{ elem.api_name }}FEATNAME_NOT" value="{{ elem.api_name }}FEATNAME_NOT">

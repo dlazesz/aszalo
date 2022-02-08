@@ -7,7 +7,6 @@ from copy import deepcopy
 from locale import setlocale, LC_ALL
 from re import compile as re_compile, error as re_error
 
-from sqlalchemy import column
 from yamale import make_schema, make_data, validate, YamaleError
 from yamale.validators import DefaultValidators, Validator
 
@@ -61,11 +60,11 @@ def read_config(conf_file):
     # Escape string for HTML
     config['ui-strings']['footer'] = config['ui-strings']['footer'].replace(r':\ ', ': ')
 
-    if 'exluded_tables' not in config:
-        config['exluded_tables'] = set()
+    if 'excluded_tables' not in config:
+        config['excluded_tables'] = set()
 
-    if 'exluded_columns' not in config:
-        config['exluded_columns'] = set()
+    if 'excluded_columns' not in config:
+        config['excluded_columns'] = set()
 
     # Overlay config
     default = config['default']
@@ -116,18 +115,18 @@ def read_config(conf_file):
     return config
 
 
-def aditional_init_from_database(settings, table_objs, session):
+def aditional_init_from_database(settings, table_objs, table_column_objs, session):
     """Updates settings dictionary from database information"""
-    selectable_tables = table_objs.keys() - settings['exluded_tables']
+    selectable_tables = table_objs.keys() - settings['excluded_tables']
     selectable_tables_list = sorted(selectable_tables)
     basic_cols = {(next(iter(field['table_name'])), field['col_name']) for field in settings['fields']
-                  if field['table_name'] is not None and field['col_name'] not in settings['exluded_columns']}
+                  if field['table_name'] is not None and field['col_name'] not in settings['excluded_columns']}
     # Init static variable from database also check for invalid table names
     try:
         all_elems_per_col = {(table_name, col_name):
-                             sorted(x._asdict()[col_name] for x in
+                             sorted(str(x._asdict()[col_name]) for x in  # Convert to string for regex mathcing
                                     session.query(table_objs[table_name]).select_from(table_objs[table_name]).
-                                    with_entities(column(col_name)).distinct().all())
+                                    with_entities(table_column_objs[(table_name, col_name)]).distinct().all())
                              for table_name, col_name in basic_cols}
     except KeyError as e:
         e.args = (f'Table \'{e.args[0]}\' not found in database!',)
@@ -140,7 +139,17 @@ def aditional_init_from_database(settings, table_objs, session):
             if len(invalid_alias_value) > 0:
                 raise ValueError(f'Some values in featelems_aliases ({invalid_alias_value}) points to invalid table'
                                  f' names!')
+            current_table_and_col = (next(iter(selectable_tables_list)), inp_field['col_name'])
         else:
+            current_table_and_col = (next(iter(inp_field['table_name'])), inp_field['col_name'])
             inp_field['all_featelems'] = selectable_tables_list
-            table_name = next(iter(inp_field['table_name']))
-            inp_field['all_elems'] = all_elems_per_col.get((table_name, inp_field['col_name']), [])
+            inp_field['all_elems'] = all_elems_per_col.get(current_table_and_col, [])
+        # Must disable regex for non-string column types!
+        inp_field['regex_disabled'] = ''
+        col_type = table_column_objs[current_table_and_col].type.python_type
+        if col_type != str:
+            inp_field['regex_disabled'] = 'disabled'
+            if len(inp_field['regex']) > 0:
+                raise ValueError(f'Column type for field {inp_field["friendly_name"]} ({inp_field["api_name"]})'
+                                 f' is not string ({col_type}) therefore regex will be disabled'
+                                 f' and must be false by default!')

@@ -3,17 +3,14 @@
 
 import re
 import sys
-import itertools
 from zipfile import ZipFile
 from codecs import iterdecode
 from collections import Counter
-from argparse import ArgumentParser, ArgumentTypeError
-
-from sqlalchemy import Column, Integer, String, MetaData, Table, create_engine, ForeignKey
+from argparse import ArgumentParser, ArgumentTypeError, FileType
 
 
-non_word = re.compile(r'^[^\w]+$')
 log = open('re.log', 'w', encoding='UTf-8')
+non_word = re.compile(r'^[^\w]+$')
 
 
 def parse_mazsola(inp_file):
@@ -91,22 +88,7 @@ def filter_mazsola(mazsola, threshold=5):
     return filter_rare_args(entries, case_count, threshold)
 
 
-def create_tables(engine, metadata, arg_cases):
-    mazsola_table = Table('mazsola', metadata,
-                          Column('id', Integer, primary_key=True),
-                          Column('sent', String),
-                          Column('verbstem', String, index=True),
-                          Column('frame', String, index=True))
-
-    other_tables = {case: Table(case, metadata,
-                                Column('id', Integer, ForeignKey('mazsola.id'), index=True),
-                                Column('argstem', String, index=True))
-                    for case in arg_cases if case != 'STEM'}
-    metadata.create_all(engine)
-    return mazsola_table, other_tables
-
-
-def gen_mazsola_dict(arg_tables, mazsola):
+def gen_mazsola_tsv_rows(mazsola, header_keys):
     for sent, args in mazsola:
         new_args = {}
         for case, val in args.items():  # Because SQL is case insensitive and does not allow empty table names
@@ -118,24 +100,13 @@ def gen_mazsola_dict(arg_tables, mazsola):
             else:
                 new_args[case] = val
 
-        frame = ' '.join(sorted(case for case in new_args.keys() if case != 'STEM'))
+        new_args['frame'] = ' '.join(sorted(case for case in new_args.keys() if case != 'STEM'))
+        new_args['sent'] = sent
 
-        yield ({'sent': sent, 'verbstem': new_args['STEM'], 'frame': frame},
-               {arg_tables[case]: val for case, val in new_args.items() if case != 'STEM'})
-
-
-def chunked_iterator(iterable, n):
-    # Original source:
-    # https://stackoverflow.com/questions/8991506/iterate-an-iterator-by-chunks-of-n-in-python/29524877#29524877
-    it = iter(iterable)
-    try:
-        while True:
-            yield itertools.chain((next(it),), itertools.islice(it, n-1))
-    except StopIteration:
-        return
+        yield [new_args.get(elem, 'NULL') for elem in header_keys]  # NULL is the value of missing fields
 
 
-def mazsola2sql(in_file, out_db, filter_entries=True, rare_arg_threshold=5, chunksize=100000):
+def mazsola2tsv(in_file, out_file, filter_entries=True, rare_arg_threshold=5):
     orig_mazsola = parse_mazsola(in_file)
     if filter_entries:
         mazsola_final = filter_mazsola(orig_mazsola, rare_arg_threshold)
@@ -143,21 +114,16 @@ def mazsola2sql(in_file, out_db, filter_entries=True, rare_arg_threshold=5, chun
         mazsola_final = list(orig_mazsola)
 
     # SQL is case insensitive and does not allow empty table names!
-    frequent_args = sorted({case.upper() for _, args in mazsola_final for case in args.keys() if len(case) > 0})
+    args_header = sorted({case.upper() for _, args in mazsola_final for case in args.keys()
+                          if len(case) > 0 and case != 'STEM'})
+    args_header.append('STEM')
+    args_header.append('frame')
+    args_header.append('sent')
 
-    engine = create_engine(f'sqlite:///{out_db}')
-    metadata = MetaData()
-    mazsola_table, other_tables = create_tables(engine, metadata, frequent_args)
-    with engine.connect() as conn:
-        for i, batch in enumerate(chunked_iterator(gen_mazsola_dict(other_tables, mazsola_final), chunksize), start=1):
-            with conn.begin():
-                for main_table_vals, arg_tables in batch:
-                    row = conn.execute(mazsola_table.insert(), main_table_vals)  # Instert sentence
-                    for other_table_name, val in arg_tables.items():  # Insert args to their table
-                        conn.execute(other_table_name.insert(), {'id': row.inserted_primary_key[0], 'argstem': val})
-            print(i*chunksize, flush=True)
-        print('VACUUM-ing...', flush=True)
-        conn.execute('VACUUM;')
+    print('INFO: Writing output!', file=sys.stderr, flush=True)
+    print(*args_header, sep='\t', file=out_file)
+    for line in gen_mazsola_tsv_rows(mazsola_final, args_header):
+        print(*line, sep='\t', file=out_file)
 
 
 def check_positive(value):
@@ -175,9 +141,9 @@ def check_positive(value):
 def parse_args():
     parser = ArgumentParser(description='Convert Mazsola to SQLite format with or without filtering')
     parser.add_argument('-i', '--input', dest='input_file', required=True,
-                        help='Input file (mazsola_adatbazis.txt.zip)', metavar='FILES')
-    parser.add_argument('-o', '--output', dest='output_file', required=True,
-                        help='Output SQLite filename (mazsola.sqlite3)', metavar='FILE')
+                        help='Input file (mazsola_adatbazis.txt.zip)', metavar='FILE')
+    parser.add_argument('-o', '--output', dest='output_file', required=True, type=FileType('w', encoding='UTF-8'),
+                        help='Output TSV filename (mazsola.TSV)', metavar='FILE', default=sys.stdout)
     parser.add_argument('-f', '--filter', dest='filter', action='store_true',
                         help='Filter Mazsola or not (default: true)')
     parser.add_argument('-t', '--threshold', dest='threshold', type=check_positive, metavar='NUM', default=5,
@@ -192,4 +158,5 @@ def parse_args():
 
 if __name__ == '__main__':
     opts = parse_args()
-    mazsola2sql(opts['input_file'], opts['output_file'], opts['filter'], opts['threshold'])
+    mazsola2tsv(opts['input_file'], opts['output_file'], opts['filter'], opts['threshold'])
+    opts['output_file'].close()  # Because argparse opened it in FileType()

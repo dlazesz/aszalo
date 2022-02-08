@@ -1,7 +1,7 @@
 title: str(min=1, required=False, none=False)
 database_name: str(min=1, required=False, none=False)
-exluded_tables: set( required=False, none=False)
-exluded_columns: set( required=False, none=False)
+excluded_tables: set( required=False, none=False)
+excluded_columns: set( required=False, none=False)
 displayed_column_table_name: str(min=1, required=False, none=False)
 displayed_column_name: str(min=1, required=False, none=False)
 

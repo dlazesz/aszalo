@@ -1,7 +1,7 @@
 title: Mazsola aszaló
 database_name: mazsola_filtered_5.sqlite3
-exluded_tables: {'mazsola'}
-exluded_columns: {'sent'}
+excluded_tables: {'mazsola'}
+excluded_columns: {'sent'}
 displayed_column_table_name: mazsola
 displayed_column_name: sent
 
