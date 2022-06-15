@@ -4,6 +4,33 @@
         <title>{{title}}</title>
         <meta charset="utf-8">
         <script>
+            function setValuesForField(name, val, radio = false, valnot = false, valregex = false,
+                                       featval = null, featnot = false, featregex = false) {
+                document.getElementById(name + 'RADIO').checked=radio;
+                document.getElementById(name).value = val;
+                document.getElementById(name + 'NOT').checked = valnot;
+                document.getElementById(name + 'REGEX').checked = valregex;
+                // If featval is not set, the other "FEATNAME_*" params are omitted too!
+                if (featval  !== null || document.getElementById(name + 'FEATNAME') !== null) {
+                    document.getElementById(name + 'FEATNAME').value = value;
+                    document.getElementById(name + 'FEATNAME_NOT').checked = featnot;
+                    document.getElementById(name + 'FEATNAME_REGEX').checked = featregex;
+                }
+            }
+
+            function clearAllValues() {
+                document.getElementById('{{ formelems[0].api_name }}RADIO').checked=true;
+        {%- for elem in formelems %}
+            document.getElementById('{{ elem.api_name }}').value = '';
+            document.getElementById('{{ elem.api_name }}NOT').checked = false;
+            document.getElementById('{{ elem.api_name }}REGEX').checked = false;
+            {% if not elem.simple_input %}
+            document.getElementById('{{ elem.api_name }}FEATNAME').value = '';
+            document.getElementById('{{ elem.api_name }}FEATNAME_NOT').checked = false;
+            document.getElementById('{{ elem.api_name }}FEATNAME_REGEX').checked = false;
+           {% endif %}
+        {%- endfor %}
+            }
         {%- for elem in formelems %}
             function {{ elem.api_name }}_change() {
                 var {{ elem.api_name }}_request_url = new URL(window.location.href.split('?')[0] + '/filter');
@@ -123,6 +150,7 @@
             <br>
             <input type="submit" value="{{ ui_strings.submit }}">
             <input type="reset" value="{{ ui_strings.reset }}">
+            <input type="button" value="{{ ui_strings.clear_field_values }}" onclick="clearAllValues();" />
         </form>
         <br><br>
         {% if count > 0 %}

@@ -86,10 +86,13 @@ ui-strings:
     locale: hu_HU.UTF-8
     submit: Küldés
     reset: Visszaállítás (a legutolsó paraméterekre)
+    clear_field_values: Minden érték törlése
     n_more_elems: "{0} további találat nem került megjelenítésre"
     footer: Adatbázis:\ Kalivoda Ágnes – <a href="https://github.com/kagnes/prevcons">PrevCons</a><br>
             Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
             Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>
+            <br><br>
+            Példa:\ <a onclick="clearAllValues();setValuesForField('prev', 'be');setValuesForField('argframe', '-t');setValuesForField('style', '', true);" href="javascript:void(0);">"A be... -t stílusregiszter szerint rendezve"</a>
             <br><br>
             Hibajelentés:\ <a href="https://bit.ly/aszalohibajelento">https://bit.ly/aszalohibajelento</a><br>
             <br>

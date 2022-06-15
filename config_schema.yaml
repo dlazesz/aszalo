@@ -9,6 +9,7 @@ ui-strings:
     locale: str(required=True, none=False)
     submit: str(required=True, none=False)
     reset: str(required=True, none=False)
+    clear_field_values: str(required=True, none=False)
     footer: str(required=False, none=False)
     n_more_elems: str(required=True, none=False)
 
