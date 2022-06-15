@@ -61,6 +61,7 @@ The keys for each field element can be the following:
 - `not`: Boolean value to treat the primary input value as negated or not
 - `regex`: Boolean value to treat the primary input value as regex or not
 - `sort_key`: Boolean value to treat the field as default sort key (exactly one key must be specified by setting this value true!)
+- `limit`: The upper limit for the number of displayed options in the dropdown list when typing (0 or greater, the displayed elems are in alphabetical order)
 
 ## Other query parameters
 

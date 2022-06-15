@@ -20,7 +20,7 @@
                 {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}FEATNAME', {{ elem.api_name }}_input.value);
                 {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}FEATNAME_REGEX', document.getElementById('{{ elem.api_name }}FEATNAME_REGEX').checked);
             {% endif %}
-                var {{ elem.api_name }}_limit = 40;  // TODO wire-out!
+                var {{ elem.api_name }}_limit = {{ elem.limit }};
                 {{ elem.api_name }}_request_url.searchParams.append('api_name', '{{ elem.api_name }}');
                 {{ elem.api_name }}_request_url.searchParams.append('limit', {{ elem.api_name }}_limit);
 
@@ -61,16 +61,16 @@
                         }
                     }
                 };
-                if ({{ elem.api_name }}_input.value.length > 0) {
+                // if ({{ elem.api_name }}_input.value.length > 0) {
                     // Update the placeholder text.
                     // {{ elem.api_name }}_input.placeholder = 'Loading options...';  // TODO wire-out
 
                     // Set up and make the request.
                     {{ elem.api_name }}_request.open('GET', {{ elem.api_name }}_request_url, true);
                     {{ elem.api_name }}_request.send();
-                } else {
-                    {{ elem.api_name }}_dataList.innerHTML = '';
-                }
+                // } else {
+                //    {{ elem.api_name }}_dataList.innerHTML = '';
+                // }
             }
         {%- endfor %}
         </script>
@@ -92,14 +92,28 @@
             <label for="{{ elem.api_name }}NOT">NOT</label>
                 <input type="checkbox" {{ elem.not }} id="{{ elem.api_name }}NOT" name="{{ elem.api_name }}NOT" value="{{ elem.api_name }}NOT">
                 <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" {%- if elem.simple_input -%}oninput="{{ elem.api_name }}_change()"{% endif %} size="20">
-                    <datalist id="{{ elem.api_name }}OPTS"></datalist>
+                    <datalist id="{{ elem.api_name }}OPTS">
+                    {%- for opt in elem.opts_datalist %}
+                        <option value="{{ opt }}">{{ opt }}</option>
+                    {%- endfor %}
+                    {% if elem.opts_datalist_more|length > 0 %}
+                        <option value=" " readonly="true">{{ elem.opts_datalist_more }}</option>
+                    {% endif %}
+                    </datalist>
             <label for="{{ elem.api_name }}REGEX">Regex</label>
                 <input type="checkbox" {{ elem.regex_disabled }} {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX" {%- if elem.simple_input -%}onchange="{{ elem.api_name }}_change()"{% endif %}>
             {% if not elem.simple_input %}
             | <label for="{{ elem.api_name }}NOT">NOT</label>
                 <input type="checkbox" {{ elem.fn_not }} id="{{ elem.api_name }}FEATNAME_NOT" name="{{ elem.api_name }}FEATNAME_NOT" value="{{ elem.api_name }}FEATNAME_NOT">
                 <input list="{{ elem.api_name }}FEATOPTS" id="{{ elem.api_name }}FEATNAME" name="{{ elem.api_name }}FEATNAME" value="{{ elem.fn_value }}" oninput="{{ elem.api_name }}_change()" size="20">
-                    <datalist id="{{ elem.api_name }}FEATOPTS"></datalist>
+                    <datalist id="{{ elem.api_name }}FEATOPTS">
+                    {%- for opt in elem.featopts_datalist %}
+                        <option value="{{ opt }}">{{ opt }}</option>
+                    {%- endfor %}
+                    {% if elem.featopts_datalist_more|length > 0 %}
+                        <option value=" " readonly="true">{{ elem.featopts_datalist_more }}</option>
+                    {% endif %}
+                    </datalist>
             <label for="{{ elem.api_name }}FEATNAME_REGEX">Regex</label>
                 <input type="checkbox" {{ elem.fn_regex }} id="{{ elem.api_name }}FEATNAME_REGEX" name="{{ elem.api_name }}FEATNAME_REGEX" value="{{ elem.api_name }}FEATNAME_REGEX" onchange="{{ elem.api_name }}_change()">
             {% endif %}

@@ -16,6 +16,7 @@ default:
     regex: false
     sort_key: false
     featelems_aliases: {}
+    limit: 40
 
 fields:
     - friendly_name: igekötő

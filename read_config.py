@@ -73,7 +73,7 @@ def read_config(conf_file):
         nf = deepcopy(default)
         nf.update(field)
 
-        if len(nf.keys()) != 12:
+        if len(nf.keys()) != 13:
             raise ValueError(f'Some attributes are missing for field {nf["api_name"]}: {", ".join(nf.keys())} !')
 
         # Check for valid regexes
@@ -140,10 +140,18 @@ def aditional_init_from_database(settings, table_objs, table_column_objs, sessio
                 raise ValueError(f'Some values in featelems_aliases ({invalid_alias_value}) points to invalid table'
                                  f' names!')
             current_table_and_col = (next(iter(selectable_tables_list)), inp_field['col_name'])
+
+            inp_field['featopts_datalist'], inp_field['featopts_datalist_more'] = \
+                set_default_opts_for_filter(inp_field['all_featelems'], inp_field['limit'],
+                                            settings['ui-strings']['n_more_elems'])
         else:
             current_table_and_col = (next(iter(inp_field['table_name'])), inp_field['col_name'])
             inp_field['all_featelems'] = selectable_tables_list
             inp_field['all_elems'] = all_elems_per_col.get(current_table_and_col, [])
+
+            inp_field['opts_datalist'], inp_field['opts_datalist_more'] = \
+                set_default_opts_for_filter(inp_field['all_elems'], inp_field['limit'],
+                                            settings['ui-strings']['n_more_elems'])
         # Must disable regex for non-string column types!
         inp_field['regex_disabled'] = ''
         col_type = table_column_objs[current_table_and_col].type.python_type
@@ -153,3 +161,13 @@ def aditional_init_from_database(settings, table_objs, table_column_objs, sessio
                 raise ValueError(f'Column type for field {inp_field["friendly_name"]} ({inp_field["api_name"]})'
                                  f' is not string ({col_type}) therefore regex will be disabled'
                                  f' and must be false by default!')
+
+
+def set_default_opts_for_filter(all_elems, limit, more_items_message):
+    more = len(all_elems) - limit
+    if more > 0:
+        more_items_message_formatted = more_items_message.format(more)
+    else:
+        more_items_message_formatted = ''
+
+    return all_elems[:limit], more_items_message_formatted

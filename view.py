@@ -344,6 +344,7 @@ def checked_or_empty(val, input_field_present, default):
 
 
 def parse_filter(request_args):
+    # Get current field
     api_name = request_args.get('api_name')
     for field in settings['fields']:
         if field['api_name'] == api_name:
@@ -352,6 +353,7 @@ def parse_filter(request_args):
     else:
         return {'error': f'No field named {api_name} !'}, 400
 
+    # Setup field vals
     if curr_field['simple_input']:
         value_name = 'value'
         regex_val_name = f'{api_name}REGEX'
@@ -361,12 +363,12 @@ def parse_filter(request_args):
         regex_val_name = f'{api_name}FEATNAME_REGEX'
         all_elems = curr_field['all_featelems']
 
+    # Get arguments
     value = request_args.get(value_name, '')
-    if len(value) == 0:
-        return {'error': f'{value_name} ({value}) is empty for field {api_name} !'}, 400
     regex_val = request_args.get(regex_val_name, default=False, type=lambda v: v.lower() == 'true')
     max_len = request_args.get('limit', default=40)
 
+    # Sanitize max_len
     try:
         max_len_int = int(max_len)
     except ValueError:
@@ -375,7 +377,12 @@ def parse_filter(request_args):
     if max_len_int <= 1:
         return {'error': f'Value ({max_len}) is invalid integer for limit !'}, 400
 
-    ret = _grep_value_in_seq(value, all_elems, not regex_val)
+    # Retrive values
+    if len(value) == 0:
+        ret = all_elems
+        # return {'error': f'{value_name} ({value}) is empty for field {api_name} !'}, 400
+    else:
+        ret = _grep_value_in_seq(value, all_elems, not regex_val)
 
     if ret is None:
         return {'error': f'Value ({value}) is invalid regular expression for field {value_name} !'}, 400

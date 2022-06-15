@@ -31,3 +31,4 @@ form_field:
     not: bool(required=False)
     regex: bool(required=False)
     sort_key: bool(required=False)
+    limit: int(required=False, none=False, min=0)
