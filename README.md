@@ -41,6 +41,7 @@ The following sections can be specified:
   - `clear_field_values`: The caption of the clear button (which clears values and checkboxes for all fields)
   - `footer`: The HTML fragment to use for the footer (e.g. documentation, citation, etc.). In the `: ` (colon-space) substrings, space must be escaped with a `\` (slash) to avoid YAML parse error
   - `n_more_elems`: The fragment to use to display in the select if _N more elems available_ (`{0}` is used to denote the actual N)
+  - `save_as_tsv` and `save_as_json`: The text of the link to save the result in the respective format
 
 ## Form configuration
 

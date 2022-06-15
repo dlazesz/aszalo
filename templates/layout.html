@@ -154,7 +154,7 @@
         </form>
         <br><br>
         {% if count > 0 %}
-         {{count}} találat
+         {{count}} találat (<a href="{{ full_url }}&format=TSV">{{ ui_strings.save_as_tsv }}</a> <a href="{{ full_url }}&format=JSON">{{ ui_strings.save_as_json }}</a>)
         {% endif %}
         <br><br>
         <div>

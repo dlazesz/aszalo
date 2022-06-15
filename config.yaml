@@ -88,6 +88,8 @@ ui-strings:
     reset: Visszaállítás (a legutolsó paraméterekre)
     clear_field_values: Minden érték törlése
     n_more_elems: "{0} további találat nem került megjelenítésre"
+    save_as_tsv: Eredmények mentése TSV formátumban
+    save_as_json: Eredmények mentése JSON formátumban
     footer: Adatbázis:\ Kalivoda Ágnes – <a href="https://github.com/kagnes/prevcons">PrevCons</a><br>
             Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
             Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>

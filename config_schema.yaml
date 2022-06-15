@@ -12,6 +12,8 @@ ui-strings:
     clear_field_values: str(required=True, none=False)
     footer: str(required=False, none=False)
     n_more_elems: str(required=True, none=False)
+    save_as_tsv: str(required=True, none=False)
+    save_as_json: str(required=True, none=False)
 
 
 default: include('form_field')
