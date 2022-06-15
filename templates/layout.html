@@ -162,7 +162,7 @@
             {% if link %}
             <a style="font-size: {{- font_size }}%" href="#{{ key }}">{{ key }}</a> [{{ freq }}]
             {% else %}
-            <a style="color:black;font-size: {{- font_size }}%" href="{{ full_url }}&page={{ page }}#{{ key }}">{{ key }}</a> [{{ freq }}]
+            <a style="color:black;font-size: {{- font_size }}%" href="{{ full_url_wo_page }}&page={{ page }}#{{ key }}">{{ key }}</a> [{{ freq }}]
             {% endif %}
         {%- endfor %}
         </div>

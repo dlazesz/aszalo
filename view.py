@@ -306,16 +306,16 @@ def _grep_value_in_seq(value, all_elems, like=False):
 def render_result(state, count, out, res, base_url, full_url, out_format='HTML', debug=False):
     # Recipe from:
     # https://stackoverflow.com/questions/7734569/how-do-i-remove-a-query-string-from-url-using-python/7734686#7734686
-    full_url = urlparse(full_url)
-    query = parse_qs(full_url.query, keep_blank_values=True)
+    full_url_parts = urlparse(full_url)
+    query = parse_qs(full_url_parts.query, keep_blank_values=True)
     query.pop('page', None)  # First argument need to be str opposing bytes expected by PyCharm type hints!
-    full_url = full_url._replace(query=urlencode(query, True), fragment='')
-    full_url = urlunparse(full_url)
+    full_url_parts = full_url_parts._replace(query=urlencode(query, True), fragment='')
+    full_url_wo_page = urlunparse(full_url_parts)
 
     if out_format == 'HTML':
         out_content = render_template('layout.html', title=settings['title'], action=base_url, formelems=state,
                                       freq=out, result=res, count=count, ui_strings=settings['ui-strings'],
-                                      full_url=full_url)
+                                      full_url_wo_page=full_url_wo_page, full_url=full_url)
     elif out_format == 'JSON':
         out = {'freq': out, 'result': res, 'count': count}
         out_content = json_dumps(out, ensure_ascii=False, indent=4)

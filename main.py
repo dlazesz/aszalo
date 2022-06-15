@@ -70,7 +70,9 @@ def execute_query(query_details, limit=1000, offset=0):
             i = 0
             for part, is_displayed in ((out_prev, False), (out_disp, True), (out_next, False)):
                 for key, freq in part:
-                    out.append((key, freq, i//limit, is_displayed, lin_scale(log(freq), log(min_freq), log(max_freq))))
+                    # These values are used in the HTML template
+                    page_no = i//limit
+                    out.append((key, freq, page_no, is_displayed, lin_scale(log(freq), log(min_freq), log(max_freq))))
                     i += freq
 
     return count, out, examples
