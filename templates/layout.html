@@ -12,7 +12,7 @@
                 document.getElementById(name + 'REGEX').checked = valregex;
                 // If featval is not set, the other "FEATNAME_*" params are omitted too!
                 if (featval  !== null || document.getElementById(name + 'FEATNAME') !== null) {
-                    document.getElementById(name + 'FEATNAME').value = value;
+                    document.getElementById(name + 'FEATNAME').value = featval;
                     document.getElementById(name + 'FEATNAME_NOT').checked = featnot;
                     document.getElementById(name + 'FEATNAME_REGEX').checked = featregex;
                 }
