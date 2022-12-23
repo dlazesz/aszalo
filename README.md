@@ -106,15 +106,15 @@ A [conversion script](scripts/mazsola2tsv.py) with [example configuration](scrip
 
 There are example configs and scripts bundled to be able to easily start, using the following databases:
 
-- [PrevCons](https://github.com/kagnes/prevcons) created by Ágnes Kalivoda (the database is also bundled and the created demo service is available at: [https://aszalo.herokuapp.com/](https://aszalo.herokuapp.com/) )
+- [PrevCons](https://github.com/kagnes/prevcons) created by Ágnes Kalivoda (the database is also bundled and the created demo service is available at: [https://aszalo.deta.dev/](https://aszalo.deta.dev/) )
 - [Mazsola (Verb Argument Browser)](http://corpus.nytud.hu/mazsola/index_eng.html) created by Bálint Sass ([the database](http://corpus.nytud.hu/isz/) is too large to be included in this repository, but the conversion script is included in the [scripts](scripts) directory)
 
 ## WebUI usage examples
 
-- The actual corpus forms for the `agyon` (lit. _to death_) preverb in HTML format: https://aszalo.herokuapp.com/?prev=agyon&sort=actform
-- The actual corpus forms for the `agyon` preverb in TSV format: https://aszalo.herokuapp.com/?prev=agyon&sort=actform&format=TSV
-- The actual corpus forms for the `agyon` preverb in JSON format: https://aszalo.herokuapp.com/?prev=agyon&sort=actform&format=JSON
-- The actual corpus forms for the `agyon` preverb in HTML format limited to the 30th-40th occurence: https://aszalo.herokuapp.com/?prev=agyon&sort=actform&limit=10&page=2
+- The actual corpus forms for the `agyon` (lit. _to death_) preverb in HTML format: https://aszalo.deta.dev/?prev=agyon&sort=actform
+- The actual corpus forms for the `agyon` preverb in TSV format: https://aszalo.deta.dev/?prev=agyon&sort=actform&format=TSV
+- The actual corpus forms for the `agyon` preverb in JSON format: https://aszalo.deta.dev/?prev=agyon&sort=actform&format=JSON
+- The actual corpus forms for the `agyon` preverb in HTML format limited to the 30th-40th occurence: https://aszalo.deta.dev/?prev=agyon&sort=actform&limit=10&page=2
 
 ## CLI usage examples
 
