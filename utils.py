@@ -4,8 +4,8 @@
 import os
 
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy, inspect
-from sqlalchemy import Table, MetaData
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Table, MetaData, inspect
 
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
