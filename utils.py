@@ -1,45 +1,72 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8, vim: expandtab:ts=4 -*-
 
-import os
+from pathlib import Path
+from secrets import compare_digest
+from json import dumps as json_dumps
 
-from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Table, MetaData, inspect
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import Request, Response, HTTPException, Depends, FastAPI
+from jinja2 import FileSystemLoader, Environment
 
-from flask_httpauth import HTTPBasicAuth
-from werkzeug.security import generate_password_hash, check_password_hash
+
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Table, MetaData, inspect, create_engine
 
 from read_config import read_config, aditional_init_from_database
 
 # TODO wire it out as parameter
-settings = read_config(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.yaml'))
+JINJA_TEMPLATES_DIR = 'templates'
+CONFIG_FILE_PATH = Path(__file__).parent / 'config.yaml'
 
-app = Flask('aszalo')
-app.secret_key = 'any random string'
-app.config['SQLALCHEMY_DATABASE_URI'] = settings['database_uri']
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-app.config['JSON_AS_ASCII'] = False
-db = SQLAlchemy(app)
+settings = read_config(CONFIG_FILE_PATH)
+
+app = FastAPI(title='aszalo')
+
+engine = create_engine(settings['database_uri'], connect_args={'check_same_thread': False}, echo=False)
+SessionLocal = sessionmaker(autoflush=False, bind=engine)
+
+def get_db():
+    """Dependency
+       INFO: https://fastapi.tiangolo.com/tutorial/sql-databases/#create-a-dependency
+    """
+    db_session = SessionLocal()
+    try:
+        yield db_session
+    finally:
+        db_session.close()
+
 
 # All tables imported automatically, but we need to create a mapping from names to objects to use them easily
-table_objs = {table_name: Table(table_name, MetaData(), autoload_with=db.engine)
-              for table_name in inspect(db.engine).get_table_names()}
+table_objs = {table_name: Table(table_name, MetaData(), autoload_with=engine)
+              for table_name in inspect(engine).get_table_names()}
 table_column_objs = {(table_name, col_obj.key): col_obj for table_name, table_obj in table_objs.items()
-                     for col_obj in table_obj.columns}
+                 for col_obj in table_obj.columns}
 
 # Settings are updated from the database
-aditional_init_from_database(settings, table_objs, table_column_objs, db.session)
+aditional_init_from_database(settings, table_objs, table_column_objs, next(get_db()))
 
 
-# Other ultility functions
-# https://flask.palletsprojects.com/en/1.1.x/patterns/apierrors/
+def jinja2_env_factory(templates_directory):
+    """ Create a render_template() with pure JINJA2 to be as modular as possible
+        INFO: https://jinja.palletsprojects.com/en/3.1.x/api/
+    """
+    env = Environment(loader=FileSystemLoader(templates_directory), autoescape=True)
+    def render_template_fun(template_name, **variables_dict):
+        template = env.get_template(template_name)
+        return template.render(**variables_dict)
+
+    return render_template_fun
+
+render_template = jinja2_env_factory(JINJA_TEMPLATES_DIR)
+
+
 class InvalidUsage(Exception):
+    """INFO: https://fastapi.tiangolo.com/tutorial/handling-errors/#install-custom-exception-handlers"""
     status_code = 400
 
     def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self, message)
+        super().__init__(self, message)
         self.message = message
         if status_code is not None:
             self.status_code = status_code
@@ -51,11 +78,11 @@ class InvalidUsage(Exception):
         return rv
 
 
-@app.errorhandler(InvalidUsage)
-def handle_invalid_usage(error):
-    response = jsonify(error.to_dict(),)
-    response.status_code = error.status_code
-    return response
+@app.exception_handler(InvalidUsage)
+async def exception_handler(_: Request, exc: InvalidUsage):
+    """INFO: https://fastapi.tiangolo.com/tutorial/handling-errors/#install-custom-exception-handlers"""
+    result_json = json_dumps(exc.to_dict(), ensure_ascii=False, indent=4)
+    return Response(result_json, exc.status_code, media_type='application/json')
 
 
 def str2bool(v, missing=False):
@@ -71,20 +98,27 @@ def str2bool(v, missing=False):
         return missing
 
 
-auth = HTTPBasicAuth()
+users = {
+    "john": "hello",
+    "susan": "bye"
+}
+
+
+security = HTTPBasic()
 """
 OR
 request.environ.get('REMOTE_USER')
 request.environ.pop('HTTP_X_PROXY_REMOTE_USER', None)
 """
 
-users = {
-    "john": generate_password_hash("hello"),
-    "susan": generate_password_hash("bye")
-}
+def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+    """INFO: https://fastapi.tiangolo.com/advanced/security/http-basic-auth/"""
+    if credentials.username in users and \
+        compare_digest(users.get(credentials.password), credentials.username):
+        return credentials.username
 
-
-@auth.verify_password
-def verify_password(username, password):
-    if username in users and check_password_hash(users.get(username), password):
-        return username
+    raise HTTPException(
+        status_code=401,
+        detail='Incorrect email or password',
+        headers={'WWW-Authenticate': 'Basic'},
+    )

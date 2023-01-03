@@ -10,7 +10,7 @@ from argparse import ArgumentParser, ArgumentTypeError, FileType
 
 
 log = open('re.log', 'w', encoding='UTf-8')
-non_word = re.compile(r'^[^\w]+$')
+non_word = re.compile(r'^\W+$')
 
 
 def parse_mazsola(inp_file):

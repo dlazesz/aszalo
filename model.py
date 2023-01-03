@@ -10,7 +10,7 @@ from itertools import chain, islice
 
 from sqlalchemy import not_, or_, and_
 
-from utils import db, table_column_objs, table_objs, settings
+from utils import table_column_objs, table_objs, settings
 
 
 def add_condgroup_to_query(b_query, cond_group):
@@ -56,11 +56,11 @@ def identity(x):
     return x
 
 
-def join_union_of_groups(sort_keys, union_conds, is_outer=False):
+def join_union_of_groups(db, sort_keys, union_conds, is_outer=False):
     for table_names, col_name, form_val, is_not, is_regex in union_conds:
         q = []
         for tn in table_names:  # Create subqueries and apply filters if there are any
-            sq = db.session.query(table_column_objs[(tn, 'id')].label('key_id'))
+            sq = db.query(table_column_objs[(tn, 'id')].label('key_id'))
             sq = add_condgroup_to_query(sq, ({tn}, col_name, form_val, is_not, is_regex))
             q.append(sq)
         # Union the subqueries and join them to the main queries
@@ -73,7 +73,7 @@ def join_union_of_groups(sort_keys, union_conds, is_outer=False):
                 sort_keys[sk] = sort_keys[sk].join(sq, isouter=is_outer).filter(key_col != None)
 
 
-def execute_prepared_query(sort_keys, limit, offset):
+def execute_prepared_query(db, sort_keys, limit, offset):
     if len(sort_keys) > 1:
         transform_key = suffix_key
     else:
@@ -102,7 +102,7 @@ def execute_prepared_query(sort_keys, limit, offset):
                 out_prev.append((key, len_ids))
             elif offset <= all_count < max_offset:
                 out_disp.append((key, len_ids))
-                examples[key] = [ex for ex in get_exmples_for_ids(ids)]
+                examples[key] = [ex for ex in get_exmples_for_ids(db, ids)]
             else:
                 out_next.append((key, len_ids))
             all_count += len_ids
@@ -123,26 +123,26 @@ def grouper(iterable, n):
         return
 
 
-def get_exmples_for_ids(ids):
+def get_exmples_for_ids(db, ids):
     disp_table_name = table_objs[settings['displayed_column_table_name']]
     id_col = table_column_objs[(settings['displayed_column_table_name'], 'id')]
     disp_col_name = table_column_objs[(settings['displayed_column_table_name'], settings['displayed_column_name'])]
     for ids_group in grouper(ids, 10000):  # Query by 10 000 entries
-        base_query = db.session.query(disp_table_name).with_entities(id_col, disp_col_name)
+        base_query = db.query(disp_table_name).with_entities(id_col, disp_col_name)
         final_query = base_query.filter(id_col.in_(ids_group))
         for ex_id, ex in final_query.all():
             yield ex_id, ex.replace('<q>', '"')
 
 
-def query(query_details, limit=1000, offset=0):
+def query(db, query_details, limit=1000, offset=0):
     # Separate params
     conds, sort_key = query_details
     not_tables = []
     union_conds = []
     # Start from the sort key restricted to the conditions
-    sort_keys = {skey: db.session.query(table_column_objs[(skey, 'id')].label('key_id'),
-                                        table_column_objs[(skey, sort_key[1])].label('key_value')).
-                 select_from(table_objs[skey]) for skey in sort_key[0]}
+    sort_keys = {skey: db.query(table_column_objs[(skey, 'id')].label('key_id'),
+                                table_column_objs[(skey, sort_key[1])].label('key_value')).
+                                    select_from(table_objs[skey]) for skey in sort_key[0]}
     if sort_key[2] is not None:
         _, col_name, form_val, is_not, is_regex, not_tabs = sort_key[2]  # Sort key conds if there are any
         for sk in sort_keys.keys():
@@ -168,9 +168,9 @@ def query(query_details, limit=1000, offset=0):
                                                        (table_names, col_name, form_val, is_not, is_regex))
 
     # Add union groups
-    join_union_of_groups(sort_keys, union_conds)
+    join_union_of_groups(db, sort_keys, union_conds)
 
     # Remove negated groups
-    join_union_of_groups(sort_keys, not_tables, is_outer=True)
+    join_union_of_groups(db, sort_keys, not_tables, is_outer=True)
 
-    return execute_prepared_query(sort_keys, limit, offset)
+    return execute_prepared_query(db, sort_keys, limit, offset)

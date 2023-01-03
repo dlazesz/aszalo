@@ -8,9 +8,7 @@ from itertools import chain
 from collections import defaultdict
 from urllib.parse import urlencode, urlparse, urlunparse, parse_qs
 
-from flask import render_template
-
-from utils import settings, InvalidUsage
+from utils import settings, InvalidUsage, render_template
 from read_config import valid_re_or_none
 
 POSSIBLE_FORMATS = {'HTML', 'JSON', 'TSV'}
@@ -303,7 +301,7 @@ def _grep_value_in_seq(value, all_elems, like=False):
     return value_regex
 
 
-def render_result(state, count, out, res, base_url, full_url, out_format='HTML', debug=False):
+def render_result(state, count, out, res, messages, base_url, full_url, out_format='HTML', debug=False):
     # Recipe from:
     # https://stackoverflow.com/questions/7734569/how-do-i-remove-a-query-string-from-url-using-python/7734686#7734686
     full_url_parts = urlparse(full_url)
@@ -315,7 +313,7 @@ def render_result(state, count, out, res, base_url, full_url, out_format='HTML',
     if out_format == 'HTML':
         out_content = render_template('layout.html', title=settings['title'], action=base_url, formelems=state,
                                       freq=out, result=res, count=count, ui_strings=settings['ui-strings'],
-                                      full_url_wo_page=full_url_wo_page, full_url=full_url)
+                                      full_url_wo_page=full_url_wo_page, full_url=full_url, messages=messages)
     elif out_format == 'JSON':
         out = {'freq': out, 'result': res, 'count': count}
         out_content = json_dumps(out, ensure_ascii=False, indent=4)
@@ -365,7 +363,7 @@ def parse_filter(request_args):
 
     # Get arguments
     value = request_args.get(value_name, '')
-    regex_val = request_args.get(regex_val_name, default=False, type=lambda v: v.lower() == 'true')
+    regex_val = request_args.get(regex_val_name, default='false').lower() == 'true'
     max_len = request_args.get('limit', default=40)
 
     # Sanitize max_len

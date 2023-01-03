@@ -14,11 +14,11 @@ Aszaló generalizes this idea to modern technologies and usecases (configurable 
 
 # Setup
 
-1. This software is tested on Python 3.6 on Linux
+1. This software is tested on Python 3.10 on Linux
 2. Install requirements from requirements.txt
 3. Create config.yaml with the appropriate values (see [Configuration](#configuration) section) and create an [SQLite](https://www.sqlite.org/index.html) database
 4. Run the application:
-   - `app` class in `main.py` with a WSGI server like [Gunicorn](https://gunicorn.org/) e.g. `gunicorn main:app --log-file=-`
+   - `app` class in `main.py` with a ASGI server like [uvicorn](https://www.uvicorn.org/) e.g. `uvicorn main:app --log-file=-`
    - Run `main.py` with CLI arguments
 
 # Configuration

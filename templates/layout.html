@@ -103,7 +103,6 @@
         </script>
     </head>
     <body>
-        {% with messages = get_flashed_messages() %}
         {% if messages %}
         <ul class=flashes>
         {% for message in messages %}
@@ -111,7 +110,6 @@
         {% endfor %}
         </ul>
         {% endif %}
-        {% endwith %}
         <form action="" method="get">
         {%- for elem in formelems %}
             <input type="radio" {{ elem.sort_key }} id="{{ elem.api_name }}RADIO" name="sort" value="{{ elem.api_name }}">
