@@ -46,42 +46,58 @@ default:
     not: false
     regex: false
     sort_key: false
+    limit: 40
+    radio_tooltip: Találatok listázása az alábbi szempont szerint
+    # field_name_tooltip: A mező rövid leírása
+    not_tooltip: Negatív szűrés
+    regex_tooltip: Reguláris kifejezések engedélyezése
+    featname_not_tooltip: Negatív szűrés
+    featname_regex_tooltip: Reguláris kifejezések engedélyezése
 
 fields:
     - friendly_name: Igető
       col_name: verbstem
       api_name: verbstem
       sort_key: true
+      field_name_tooltip: A keresendő igető
 
     - friendly_name: Argumentum 1
       table_name: null
       col_name: argstem
       api_name: arg1
+      field_name_tooltip: A bővítmény konkrét töve (első mező), a bővítmény grammatikai esete (második mező)
 
     - friendly_name: Argumentum 2
       table_name: null
       col_name: argstem
       api_name: arg2
+      field_name_tooltip: A bővítmény konkrét töve (első mező), a bővítmény grammatikai esete (második mező)
 
     - friendly_name: Argumentum 3
       table_name: null
       col_name: argstem
       api_name: arg3
+      field_name_tooltip: A bővítmény konkrét töve (első mező), a bővítmény grammatikai esete (második mező)
 
     - friendly_name: Keret
       col_name: frame
       api_name: frame
+      field_name_tooltip: Az igető keretek szerinti lekérdezése (az esetek ábécé sorrendben a latin nevükkel vannak jelölve)
 
     - friendly_name: Szó/kifejezés
       col_name: sent
       api_name: sent
       regex: true
+      field_name_tooltip: A teljes mondat (kikapcsolt Regex opcióval teljes mondatra történő egyezést néz)
 
 ui-strings:
     locale: hu_HU.UTF-8
     submit: Küldés
     reset: Visszaállítás (a legutolsó paraméterekre)
+    clear_field_values: Minden érték törlése
     n_more_elems: "{0} további találat nem került megjelenítésre"
+    save_as_tsv: Eredmények mentése TSV formátumban
+    save_as_json: Eredmények mentése JSON formátumban
     footer: Adatbázis:\ Sass Bálint – <a href="http://corpus.nytud.hu/isz">28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet</a><br>
             Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
             Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>

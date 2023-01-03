@@ -112,9 +112,9 @@
         {% endif %}
         <form action="" method="get">
         {%- for elem in formelems %}
-            <input type="radio" {{ elem.sort_key }} id="{{ elem.api_name }}RADIO" name="sort" value="{{ elem.api_name }}">
-            <label for="{{ elem.api_name }}RADIO" style="display: inline-block; width: 20ch;">{{ elem.friendly_name }}:</label>
-            <label for="{{ elem.api_name }}NOT">NOT</label>
+            <input type="radio" {{ elem.sort_key }} id="{{ elem.api_name }}RADIO" name="sort" value="{{ elem.api_name }}" title="{{ elem.radio_tooltip }}">
+            <label for="{{ elem.api_name }}RADIO" title="{{ elem.field_name_tooltip }}" style="display: inline-block; width: 20ch;">{{ elem.friendly_name }}:</label>
+            <label for="{{ elem.api_name }}NOT" title="{{ elem.not_tooltip }}">NOT</label>
                 <input type="checkbox" {{ elem.not }} id="{{ elem.api_name }}NOT" name="{{ elem.api_name }}NOT" value="{{ elem.api_name }}NOT">
                 <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" {%- if elem.simple_input -%}oninput="{{ elem.api_name }}_change()"{% endif %} size="20">
                     <datalist id="{{ elem.api_name }}OPTS">
@@ -125,10 +125,10 @@
                         <option value=" " readonly="true">{{ elem.opts_datalist_more }}</option>
                     {% endif %}
                     </datalist>
-            <label for="{{ elem.api_name }}REGEX">Regex</label>
+            <label for="{{ elem.api_name }}REGEX" title="{{ elem.regex_tooltip }}">Regex</label>
                 <input type="checkbox" {{ elem.regex_disabled }} {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX" {%- if elem.simple_input -%}onchange="{{ elem.api_name }}_change()"{% endif %}>
             {% if not elem.simple_input %}
-            | <label for="{{ elem.api_name }}NOT">NOT</label>
+            | <label for="{{ elem.api_name }}FEATNAME_NOT" title="{{ elem.featname_not_tooltip }}">NOT</label>
                 <input type="checkbox" {{ elem.fn_not }} id="{{ elem.api_name }}FEATNAME_NOT" name="{{ elem.api_name }}FEATNAME_NOT" value="{{ elem.api_name }}FEATNAME_NOT">
                 <input list="{{ elem.api_name }}FEATOPTS" id="{{ elem.api_name }}FEATNAME" name="{{ elem.api_name }}FEATNAME" value="{{ elem.fn_value }}" oninput="{{ elem.api_name }}_change()" size="20">
                     <datalist id="{{ elem.api_name }}FEATOPTS">
@@ -139,7 +139,7 @@
                         <option value=" " readonly="true">{{ elem.featopts_datalist_more }}</option>
                     {% endif %}
                     </datalist>
-            <label for="{{ elem.api_name }}FEATNAME_REGEX">Regex</label>
+            <label for="{{ elem.api_name }}FEATNAME_REGEX" title="{{ elem.featname_regex_tooltip }}">Regex</label>
                 <input type="checkbox" {{ elem.fn_regex }} id="{{ elem.api_name }}FEATNAME_REGEX" name="{{ elem.api_name }}FEATNAME_REGEX" value="{{ elem.api_name }}FEATNAME_REGEX" onchange="{{ elem.api_name }}_change()">
             {% endif %}
 

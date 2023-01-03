@@ -73,7 +73,7 @@ def read_config(conf_file):
         nf = deepcopy(default)
         nf.update(field)
 
-        if len(nf.keys()) != 13:
+        if len(nf.keys()) != 19:
             raise ValueError(f'Some attributes are missing for field {nf["api_name"]}: {", ".join(nf.keys())} !')
 
         # Check for valid regexes

@@ -17,70 +17,91 @@ default:
     sort_key: false
     featelems_aliases: {}
     limit: 40
+    radio_tooltip: Találatok listázása az alábbi szempont szerint
+    # field_name_tooltip: A mező rövid leírása
+    not_tooltip: Negatív szűrés
+    regex_tooltip: Reguláris kifejezések engedélyezése
+    featname_not_tooltip: Negatív szűrés
+    featname_regex_tooltip: Reguláris kifejezések engedélyezése
 
 fields:
     - friendly_name: igekötő
       col_name: prev
       api_name: prev
       sort_key: true
+      field_name_tooltip: A keresendő igekötő(k)
 
     - friendly_name: igelemma
       col_name: verb
       api_name: verb
+      field_name_tooltip: A keresendő igelemma(ák)
 
     - friendly_name: szóalak
       col_name: actform
       api_name: actform
+      field_name_tooltip: A keresendő igealak(ok)
 
     - friendly_name: vonzatkeret
       col_name: argframe
       api_name: argframe
+      field_name_tooltip: A keresendő vonzatkeret
 
     - friendly_name: igekötő produktivitása
       col_name: prev_prod
       api_name: prev_prod
+      field_name_tooltip: Az igekötő produktivitása
 
     - friendly_name: igekötő hapaxai (db)
       col_name: prev_hapaxes
       api_name: prev_hapaxes
+      field_name_tooltip: Az igekötő hapaxai (db)
 
     - friendly_name: igealkotási mód
       col_name: inputtype
       api_name: inputtype
+      field_name_tooltip: Az igealkotási mód
 
     - friendly_name: a képző/h.séma típusa
       col_name: suffixtype
       api_name: suffixtype
+      field_name_tooltip: A képző/h.séma típusa
 
     - friendly_name: CV-séma
       col_name: phonotype
       api_name: phonotype
+      field_name_tooltip: A hangzásséma (C = mássalhangzó, V = magánhangzó)
 
     - friendly_name: stílusregiszter
       col_name: style
       api_name: style
+      field_name_tooltip: A stílusregiszter(ek)
 
     - friendly_name: régió
       col_name: region
       api_name: region
+      field_name_tooltip: A régió(k)
 
     - friendly_name: word2vec bemenet
       col_name: w2v_input
       api_name: w2v_input
+      field_name_tooltip: A word2vec bemenet
 
     - friendly_name: word2vec klaszter
       col_name: w2v_cluster
       api_name: w2v_cluster
+      field_name_tooltip: A word2vec klaszter
 
     - friendly_name: tagmondat
       col_name: clause
       api_name: clause
       regex: true
+      field_name_tooltip: A tagmondat (kikapcsolt Regex opcióval teljes tagmondatra történő egyezést néz)
 
     - friendly_name: teljes mondat
       col_name: sent
       api_name: sent
       regex: true
+      field_name_tooltip: A teljes mondat (kikapcsolt Regex opcióval teljes mondatra történő egyezést néz)
 
 ui-strings:
     locale: hu_HU.UTF-8

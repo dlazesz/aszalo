@@ -64,6 +64,12 @@ The keys for each field element can be the following:
 - `regex`: Boolean value to treat the primary input value as regex or not
 - `sort_key`: Boolean value to treat the field as default sort key (exactly one key must be specified by setting this value true!)
 - `limit`: The upper limit for the number of displayed options in the dropdown list when typing (0 or greater, the displayed elems are in alphabetical order)
+- `radio_tooltip`: Tooltip for the radio button
+- `field_name_tooltip`: Tooltip for the field name text
+- `not_tooltip`: Tooltip for the NOT text (for the first checkbox if there are two)
+- `regex_tooltip`: Tooltip for the Regex text (for the first checkbox if there are two)
+- `featname_not_tooltip`: Tooltip for the NOT text (for the second checkbox if there are two)
+- `featname_regex_tooltip`: Tooltip for the Regex text (for the second checkbox if there are two)
 
 ## Other query parameters
 
