@@ -1,0 +1,7 @@
+# Exclude everything except the explicitly enabled files
+*
+!*.sqlite3
+!templates
+!*.yaml
+!*.py
+!requirements.txt
