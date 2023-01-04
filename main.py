@@ -16,7 +16,7 @@ from view import parse_view, render_result, parse_filter, render_filter
 
 
 @app.get('/filter')
-def filter_field(request: Request):
+async def filter_field(request: Request):
     return main_filter(request.query_params)
 
 
@@ -28,7 +28,7 @@ def main_filter(input_args):  #, username: str = Depends(get_current_username)):
 
 
 @app.get('/')  # So one can create permalink for searches!
-def index(request: Request, db: Session = Depends(get_db)):  #, username: str = Depends(get_current_username)):
+async def index(request: Request, db: Session = Depends(get_db)):  #, username: str = Depends(get_current_username)):
     return main_query(request.query_params, db, str(request.base_url), str(request.url))
 
 

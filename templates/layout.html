@@ -4,6 +4,12 @@
         <title>{{title}}</title>
         <meta charset="utf-8">
         <script>
+            const fields = [
+        {%- for elem in formelems %}
+                            ['{{ elem.api_name }}', {{ elem.simple_input|int }}, {{ elem.limit }}],
+        {%- endfor %}
+                           ];
+
             function setValuesForField(name, val, radio = false, valnot = false, valregex = false,
                                        featval = null, featnot = false, featregex = false) {
                 document.getElementById(name + 'RADIO').checked=radio;
@@ -19,87 +25,82 @@
             }
 
             function clearAllValues() {
-                document.getElementById('{{ formelems[0].api_name }}RADIO').checked=true;
-        {%- for elem in formelems %}
-            document.getElementById('{{ elem.api_name }}').value = '';
-            document.getElementById('{{ elem.api_name }}NOT').checked = false;
-            document.getElementById('{{ elem.api_name }}REGEX').checked = false;
-            {% if not elem.simple_input %}
-            document.getElementById('{{ elem.api_name }}FEATNAME').value = '';
-            document.getElementById('{{ elem.api_name }}FEATNAME_NOT').checked = false;
-            document.getElementById('{{ elem.api_name }}FEATNAME_REGEX').checked = false;
-           {% endif %}
-        {%- endfor %}
+                for (let field of fields) {
+                    var featval = null;
+                    if (!field[1]) {featval = '';}
+                    setValuesForField(field[0], '', false, false, false, featval, false, false);
+                }
+                document.getElementById(fields[0][0]+'RADIO').checked=true;
             }
-        {%- for elem in formelems %}
-            function {{ elem.api_name }}_change() {
-                var {{ elem.api_name }}_request_url = new URL(window.location.href.split('?')[0] + '/filter');
-            {% if elem.simple_input %}
-                // Get the <datalist> and <input> elements.
-                var {{ elem.api_name }}_dataList = document.getElementById('{{ elem.api_name }}OPTS');
-                var {{ elem.api_name }}_input = document.getElementById('{{ elem.api_name }}');
-                {{ elem.api_name }}_request_url.searchParams.append('value', {{ elem.api_name }}_input.value);
-                {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}REGEX', document.getElementById('{{ elem.api_name }}REGEX').checked);
-            {% else %}
-                // Get the <datalist> and <input> elements.
-                var {{ elem.api_name }}_dataList = document.getElementById('{{ elem.api_name }}FEATOPTS');
-                var {{ elem.api_name }}_input = document.getElementById('{{ elem.api_name }}FEATNAME');
-                {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}FEATNAME', {{ elem.api_name }}_input.value);
-                {{ elem.api_name }}_request_url.searchParams.append('{{ elem.api_name }}FEATNAME_REGEX', document.getElementById('{{ elem.api_name }}FEATNAME_REGEX').checked);
-            {% endif %}
-                var {{ elem.api_name }}_limit = {{ elem.limit }};
-                {{ elem.api_name }}_request_url.searchParams.append('api_name', '{{ elem.api_name }}');
-                {{ elem.api_name }}_request_url.searchParams.append('limit', {{ elem.api_name }}_limit);
+
+            function changeValueOfField(name, is_simple, limit) {
+                var request_url = new URL(window.location.href.split('?')[0] + 'filter');
+                if (is_simple) {
+                    // Get the <datalist> and <input> elements.
+                    var dataList = document.getElementById(name + 'OPTS');
+                    var input = document.getElementById(name);
+                    request_url.searchParams.append('value', input.value);
+                    request_url.searchParams.append(name + 'REGEX',
+                     document.getElementById(name + 'REGEX').checked);
+                } else {
+                    // Get the <datalist> and <input> elements for FEAT.
+                    var dataList = document.getElementById(name + 'FEATOPTS');
+                    var input = document.getElementById(name + 'FEATNAME');
+                    request_url.searchParams.append(name + 'FEATNAME', input.value);
+                    request_url.searchParams.append(name + 'FEATNAME_REGEX',
+                     document.getElementById(name + 'FEATNAME_REGEX').checked);
+                }
+                request_url.searchParams.append('api_name', name);
+                request_url.searchParams.append('limit', limit);
 
                 // Create a new XMLHttpRequest.
-                var {{ elem.api_name }}_request = new XMLHttpRequest();
+                var request = new XMLHttpRequest();
 
                 // Handle state changes for the request.
-                {{ elem.api_name }}_request.onreadystatechange = function (response) {
-                    if ({{ elem.api_name }}_request.readyState === 4) {
-                        if ({{ elem.api_name }}_request.status === 200) {
-                            {{ elem.api_name }}_dataList.innerHTML = '';
+                request.onreadystatechange = function (response) {
+                    if (request.readyState === 4) {
+                        if (request.status === 200) {
+                            dataList.innerHTML = '';
                             // Parse the JSON
-                            var jsonOptions = JSON.parse({{ elem.api_name }}_request.responseText)['values'];
+                            var jsonOptions = JSON.parse(request.responseText)['values'];
 
                             // Loop over the JSON array.
                             jsonOptions.forEach(function (item, i) {
 
                                 // Create a new <option> element.
                                 var option = document.createElement('option');
-                                if (i < jsonOptions.length -1 || jsonOptions.length < {{ elem.api_name }}_limit ) {
+                                if (i < jsonOptions.length -1 || jsonOptions.length < limit ) {
 
                                     // Set the value using the item in the JSON array.
                                     option.value = item;
                                 } else {
 
                                     // Set the value using the value typed into the input.
-                                    option.value = ' '; // {{ elem.api_name }}_input.value;
+                                    option.value = ' '; // input.value;
                                     option.setAttribute('readonly', true);
                                 }
                                 option.innerHTML = item;
 
                                 // Add the <option> element to the <datalist>.
-                                {{ elem.api_name }}_dataList.appendChild(option);
+                                dataList.appendChild(option);
                             });
                         } else {
                             // An error occured :(
-                            {{ elem.api_name }}_input.placeholder = JSON.parse({{ elem.api_name }}_request.responseText)['error'];
+                            input.placeholder = JSON.parse(request.responseText)['error'];
                         }
                     }
                 };
-                // if ({{ elem.api_name }}_input.value.length > 0) {
+                // if (input.value.length > 0) {
                     // Update the placeholder text.
-                    // {{ elem.api_name }}_input.placeholder = 'Loading options...';  // TODO wire-out
+                    // input.placeholder = 'Loading options...';  // TODO wire-out
 
                     // Set up and make the request.
-                    {{ elem.api_name }}_request.open('GET', {{ elem.api_name }}_request_url, true);
-                    {{ elem.api_name }}_request.send();
+                    request.open('GET', request_url, true);
+                    request.send();
                 // } else {
-                //    {{ elem.api_name }}_dataList.innerHTML = '';
+                //    dataList.innerHTML = '';
                 // }
             }
-        {%- endfor %}
         </script>
     </head>
     <body>
@@ -116,7 +117,7 @@
             <label for="{{ elem.api_name }}RADIO" title="{{ elem.field_name_tooltip }}" style="display: inline-block; width: 20ch;">{{ elem.friendly_name }}:</label>
             <label for="{{ elem.api_name }}NOT" title="{{ elem.not_tooltip }}">NOT</label>
                 <input type="checkbox" {{ elem.not }} id="{{ elem.api_name }}NOT" name="{{ elem.api_name }}NOT" value="{{ elem.api_name }}NOT">
-                <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" {%- if elem.simple_input -%}oninput="{{ elem.api_name }}_change()"{% endif %} size="20">
+                <input list="{{ elem.api_name }}OPTS" id="{{ elem.api_name }}" name="{{ elem.api_name }}" value="{{ elem.value }}" {% if elem.simple_input -%}oninput="changeValueOfField('{{ elem.api_name }}', {{ elem.simple_input|int }}, {{ elem.limit }})"{% endif %} size="20">
                     <datalist id="{{ elem.api_name }}OPTS">
                     {%- for opt in elem.opts_datalist %}
                         <option value="{{ opt }}">{{ opt }}</option>
@@ -126,11 +127,11 @@
                     {% endif %}
                     </datalist>
             <label for="{{ elem.api_name }}REGEX" title="{{ elem.regex_tooltip }}">Regex</label>
-                <input type="checkbox" {{ elem.regex_disabled }} {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX" {%- if elem.simple_input -%}onchange="{{ elem.api_name }}_change()"{% endif %}>
+                <input type="checkbox" {{ elem.regex_disabled }} {{ elem.regex }} id="{{ elem.api_name }}REGEX" name="{{ elem.api_name }}REGEX" value="{{ elem.api_name }}REGEX" {% if elem.simple_input -%}onchange="changeValueOfField('{{ elem.api_name }}', {{ elem.simple_input|int }}, {{ elem.limit }})"{% endif %}>
             {% if not elem.simple_input %}
             | <label for="{{ elem.api_name }}FEATNAME_NOT" title="{{ elem.featname_not_tooltip }}">NOT</label>
                 <input type="checkbox" {{ elem.fn_not }} id="{{ elem.api_name }}FEATNAME_NOT" name="{{ elem.api_name }}FEATNAME_NOT" value="{{ elem.api_name }}FEATNAME_NOT">
-                <input list="{{ elem.api_name }}FEATOPTS" id="{{ elem.api_name }}FEATNAME" name="{{ elem.api_name }}FEATNAME" value="{{ elem.fn_value }}" oninput="{{ elem.api_name }}_change()" size="20">
+                <input list="{{ elem.api_name }}FEATOPTS" id="{{ elem.api_name }}FEATNAME" name="{{ elem.api_name }}FEATNAME" value="{{ elem.fn_value }}" oninput="changeValueOfField('{{ elem.api_name }}', {{ elem.simple_input|int }}, {{ elem.limit }})" size="20">
                     <datalist id="{{ elem.api_name }}FEATOPTS">
                     {%- for opt in elem.featopts_datalist %}
                         <option value="{{ opt }}">{{ opt }}</option>
@@ -140,7 +141,7 @@
                     {% endif %}
                     </datalist>
             <label for="{{ elem.api_name }}FEATNAME_REGEX" title="{{ elem.featname_regex_tooltip }}">Regex</label>
-                <input type="checkbox" {{ elem.fn_regex }} id="{{ elem.api_name }}FEATNAME_REGEX" name="{{ elem.api_name }}FEATNAME_REGEX" value="{{ elem.api_name }}FEATNAME_REGEX" onchange="{{ elem.api_name }}_change()">
+                <input type="checkbox" {{ elem.fn_regex }} id="{{ elem.api_name }}FEATNAME_REGEX" name="{{ elem.api_name }}FEATNAME_REGEX" value="{{ elem.api_name }}FEATNAME_REGEX" onchange="changeValueOfField('{{ elem.api_name }}', {{ elem.simple_input|int }}, {{ elem.limit }})">
             {% endif %}
 
             <br>
