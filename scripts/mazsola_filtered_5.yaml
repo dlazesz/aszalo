@@ -1,13 +1,13 @@
 default:
     # The name of the column in the input TSV
     # column_name: ...
-    # Main table name (can be the only table if all column reside in one table or set/overwritten if separate is true)
+    # Main table name (ignored for the actual column if it resides in separate table, e.g. separate is true)
     # table_name: mazsola
     # Unified column name for separate tables or unique name for main table (id as value is not allowed!)
     sql_column_name: argstem
     # Type for SQL in Python format
     column_type: str
-    # Create index for column in the SQL or not
+    # Create index for column in the SQL or not (generally recommended to being set true, see 'general considerations')
     index: true
     # Column belongs to the main table or to a separate table? (set/overwrite table_name if true)
     separate: true
