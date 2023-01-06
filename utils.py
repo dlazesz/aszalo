@@ -4,6 +4,7 @@
 from pathlib import Path
 from secrets import compare_digest
 from json import dumps as json_dumps
+from contextlib import contextmanager
 
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Request, Response, HTTPException, Depends, FastAPI
@@ -26,9 +27,11 @@ app = FastAPI(title='aszalo')
 engine = create_engine(settings['database_uri'], connect_args={'check_same_thread': False}, echo=False)
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
 
+@contextmanager
 def get_db():
-    """Dependency
+    """Dependency vs. contextmanager
        INFO: https://fastapi.tiangolo.com/tutorial/sql-databases/#create-a-dependency
+       INFO: https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager
     """
     db_session = SessionLocal()
     try:
@@ -44,7 +47,8 @@ table_column_objs = {(table_name, col_obj.key): col_obj for table_name, table_ob
                  for col_obj in table_obj.columns}
 
 # Settings are updated from the database
-aditional_init_from_database(settings, table_objs, table_column_objs, next(get_db()))
+with get_db() as db:
+    aditional_init_from_database(settings, table_objs, table_column_objs, db)
 
 
 def jinja2_env_factory(templates_directory):

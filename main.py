@@ -7,11 +7,10 @@ from functools import lru_cache
 from argparse import ArgumentParser
 
 import uvicorn
-from sqlalchemy.orm import Session
-from fastapi import Request, Response, Depends
+from fastapi import Request, Response
 
 from model import query
-from utils import app, InvalidUsage, str2bool, settings, get_db # , get_current_username
+from utils import app, InvalidUsage, str2bool, settings  # , get_current_username
 from view import parse_view, render_result, parse_filter, render_filter
 
 
@@ -28,11 +27,11 @@ def main_filter(input_args):  #, username: str = Depends(get_current_username)):
 
 
 @app.get('/')  # So one can create permalink for searches!
-async def index(request: Request, db: Session = Depends(get_db)):  #, username: str = Depends(get_current_username)):
-    return main_query(request.query_params, db, str(request.base_url), str(request.url))
+async def index(request: Request):  #, username: str = Depends(get_current_username)):
+    return main_query(request.query_params, str(request.base_url), str(request.url))
 
 
-def main_query(input_args, db, base_url='', full_url=''):
+def main_query(input_args, base_url='', full_url=''):
     exc_tb, state, query_details, other_params = parse_view(input_args)
     messages = []
     if len(exc_tb) > 0:
@@ -43,7 +42,7 @@ def main_query(input_args, db, base_url='', full_url=''):
         else:
             for _, message, _ in exc_tb:
                 messages.append(message)
-    count, out, res = execute_query(db, query_details, limit=other_params['limit'],
+    count, out, res = execute_query(query_details, limit=other_params['limit'],
                                     offset=other_params.get('page', 0)*other_params['limit'])
     result = render_result(state, count, out, res, messages, base_url, full_url, other_params['format'])
     if other_params['format'] == 'HTML' and len(base_url) > 0:
@@ -63,10 +62,10 @@ def lin_scale(freq, min_freq, max_freq, min_size=80, max_size=240):  # The font-
 
 
 @lru_cache(10)
-def execute_query(db, query_details, limit=1000, offset=0):
+def execute_query(query_details, limit=1000, offset=0):
     count, out, examples = 0, [], {}
     if len(query_details) > 0:
-        count, min_freq, max_freq, out_prev, out_disp, out_next, examples = query(db, query_details, limit, offset)
+        count, min_freq, max_freq, out_prev, out_disp, out_next, examples = query(query_details, limit, offset)
 
         # Postprocess
         if count > 0:
@@ -117,7 +116,6 @@ def parse_args():
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         args = parse_args()
-        db_session = next(get_db())
-        print(main_query(args, db_session))
+        print(main_query(args))
     else:
         uvicorn.run('main:app')

@@ -10,7 +10,7 @@ from itertools import chain, islice
 
 from sqlalchemy import not_, or_, and_
 
-from utils import table_column_objs, table_objs, settings
+from utils import table_column_objs, table_objs, settings, get_db
 
 
 def add_condgroup_to_query(b_query, cond_group):
@@ -134,43 +134,48 @@ def get_exmples_for_ids(db, ids):
             yield ex_id, ex.replace('<q>', '"')
 
 
-def query(db, query_details, limit=1000, offset=0):
+def query(query_details, limit=1000, offset=0):
     # Separate params
     conds, sort_key = query_details
     not_tables = []
     union_conds = []
-    # Start from the sort key restricted to the conditions
-    sort_keys = {skey: db.query(table_column_objs[(skey, 'id')].label('key_id'),
-                                table_column_objs[(skey, sort_key[1])].label('key_value')).
-                                    select_from(table_objs[skey]) for skey in sort_key[0]}
-    if sort_key[2] is not None:
-        _, col_name, form_val, is_not, is_regex, not_tabs = sort_key[2]  # Sort key conds if there are any
-        for sk in sort_keys.keys():
-            sort_keys[sk] = add_condgroup_to_query(sort_keys[sk], ({sk}, col_name, form_val, is_not, is_regex))
-        if len(not_tabs) > 0:
-            not_tables.append((not_tabs, col_name, None, False, False))
 
-    # Filter keys further separately if there are multiple keys
-    for table_names, col_name, form_val, is_not, is_regex, not_tabs in conds:
-        if len(not_tabs) > 0:
-            not_tables.append((not_tabs, col_name, None, False, False))
-        if len(table_names) > 1:  # Union later
-            union_conds.append((table_names, col_name, form_val, is_not, is_regex))
-        elif len(table_names) == 1:
-            tn = next(iter(table_names))
+    with get_db() as db:  # Initialize a DB session
+        # Start from the sort key restricted to the conditions
+        sort_keys = {skey: db.query(table_column_objs[(skey, 'id')].label('key_id'),
+                                    table_column_objs[(skey, sort_key[1])].label('key_value')).
+                                        select_from(table_objs[skey]) for skey in sort_key[0]}
+        if sort_key[2] is not None:
+            _, col_name, form_val, is_not, is_regex, not_tabs = sort_key[2]  # Sort key conds if there are any
             for sk in sort_keys.keys():
-                if sk != tn:  # JOIN tables if needed always LEFT join to the key table!
-                    table_obj = table_objs[tn]
-                    join_on = table_column_objs[(sk, 'id')] == table_column_objs[(tn, 'id')]
-                    sort_keys[sk] = sort_keys[sk].join(table_obj, join_on)
-            for sk in sort_keys.keys():  # Restrict joined tables
-                sort_keys[sk] = add_condgroup_to_query(sort_keys[sk],
-                                                       (table_names, col_name, form_val, is_not, is_regex))
+                sort_keys[sk] = add_condgroup_to_query(sort_keys[sk], ({sk}, col_name, form_val, is_not, is_regex))
+            if len(not_tabs) > 0:
+                not_tables.append((not_tabs, col_name, None, False, False))
 
-    # Add union groups
-    join_union_of_groups(db, sort_keys, union_conds)
+        # Filter keys further separately if there are multiple keys
+        for table_names, col_name, form_val, is_not, is_regex, not_tabs in conds:
+            if len(not_tabs) > 0:
+                not_tables.append((not_tabs, col_name, None, False, False))
+            if len(table_names) > 1:  # Union later
+                union_conds.append((table_names, col_name, form_val, is_not, is_regex))
+            elif len(table_names) == 1:
+                tn = next(iter(table_names))
+                for sk in sort_keys.keys():
+                    if sk != tn:  # JOIN tables if needed always LEFT join to the key table!
+                        table_obj = table_objs[tn]
+                        join_on = table_column_objs[(sk, 'id')] == table_column_objs[(tn, 'id')]
+                        sort_keys[sk] = sort_keys[sk].join(table_obj, join_on)
+                for sk in sort_keys.keys():  # Restrict joined tables
+                    sort_keys[sk] = add_condgroup_to_query(sort_keys[sk],
+                                                           (table_names, col_name, form_val, is_not, is_regex))
 
-    # Remove negated groups
-    join_union_of_groups(db, sort_keys, not_tables, is_outer=True)
+        # Add union groups
+        join_union_of_groups(db, sort_keys, union_conds)
 
-    return execute_prepared_query(db, sort_keys, limit, offset)
+        # Remove negated groups
+        join_union_of_groups(db, sort_keys, not_tables, is_outer=True)
+
+        # Actually execute the query
+        ret = execute_prepared_query(db, sort_keys, limit, offset)
+
+    return ret
