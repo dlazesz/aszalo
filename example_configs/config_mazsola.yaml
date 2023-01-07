@@ -98,6 +98,19 @@ ui-strings:
     n_more_elems: "{0} további találat nem került megjelenítésre"
     save_as_tsv: Eredmények mentése TSV formátumban
     save_as_json: Eredmények mentése JSON formátumban
+    regex_disabled: Regex is disabled for field {0} ({1}) because it is non-sting type, but regex parameter is checked for field!
+    sort_key_invalid: Sort key (sort) is empty or has invalid value or the selected field has invalid value!
+    featname_in_multiple_fields: Using feat name ({0}) in multiple fields ({1}) is not allowed!
+    same_feature_with_pos_and_neg_signs: Using the same feature ({0}) with positive and negative signs in multiple fields ({1}) is not allowed!
+    too_mutch_features_specified: Only 60 features are allowed in a single query isntead of {0} !
+    featname_value_too_broad_regex: Feature name value ({0}) is too broad regular expression at \'{1}\' ({2}FEATNAME)!
+    invalid_format: Value ({0}) is invalid for FORMAT expected {1} !
+    invalid_value: Value ({0}) is not in available elems at \'{1}\' ({2})!
+    featname_invalid_value: Feature name value ({0}) is not in the selectable list at \'{1}\' ({2}FEATNAME)!
+    invalid_regex: Value ({0}) is invalid regular expression at \'{1}\' ({2})!
+    featname_invalid_regex: Feature name value ({0}) is invalid regular expression at \'{1}\' ({2}FEATNAME)!
+    non_empty_value_for_empty_featname: Value is not empty ({1}) for empty feature name at \'{1}\' ({2})!
+    featname_regex_invalid_value: Feature name value ({0}) regular expression does not match any possible value at \'{ 1 }\' ({2}FEATNAME)!
     footer: Adatbázis:\ Sass Bálint – <a href="http://corpus.nytud.hu/isz">28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet</a><br>
             Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
             Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>

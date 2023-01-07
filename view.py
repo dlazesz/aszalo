@@ -38,8 +38,7 @@ def parse_view(request_args):
 
             # Regex disabled, still used as parameter
             if len(field_state['regex_disabled']) > 0 and len(field_state['regex']) > 0:
-                raise InvalidUsage('Regex is disabled for field {0} ({1}) because it is non-sting type,'
-                                   ' but regex parameter is checked for field!'.
+                raise InvalidUsage(settings['ui-strings']['regex-disabled'].
                                    format(field_state['friendly_name'], field_state['api_name']),
                                    status_code=400)
 
@@ -90,8 +89,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
     try:
         if sort_key is None:  # Bad omen: no sort key at the end -> The query will not be executed
             query_params = ()
-            raise InvalidUsage('Sort key (sort) is empty or has invalid value or the selected field'
-                               ' has invalid value!',
+            raise InvalidUsage(settings['ui-strings']['sort_key_invalid'],
                                status_code=400)
         query_params = (conds, sort_key)
     except InvalidUsage as e:
@@ -106,7 +104,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
             used_tables.add(table_name)
             if len(v) > 1:
                 query_params = ()
-                raise InvalidUsage('Using feat name ({0}) in multiple fields ({1}) is not allowed!'.
+                raise InvalidUsage(settings['ui-strings']['featname_in_multiple_fields'].
                                    format(table_name, ' and '.join(f'\'{friendly_name}\' ({api_name})'
                                                                    for friendly_name, api_name in v)),
                                    status_code=400)
@@ -116,7 +114,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
             not_used_tables.add(table_name)
             if len(v) > 1:
                 query_params = ()
-                raise InvalidUsage('Using feat name ({0}) in multiple fields ({1}) is not allowed!'.
+                raise InvalidUsage(settings['ui-strings']['featname_in_multiple_fields'].
                                    format(table_name, ' and '.join(f'\'{friendly_name}\' ({api_name})'
                                                                    for friendly_name, api_name in v)),
                                    status_code=400)
@@ -127,8 +125,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
             common_tablenames_to_fields[table_col_name].append(v[0])
             if len(common_tablenames_to_fields[table_col_name]) > 1:
                 query_params = ()
-                raise InvalidUsage('Using the same feature with positive and negative signs in multiple fields'
-                                   ' ({1}) is not allowed!'.
+                raise InvalidUsage(settings['ui-strings']['same_feature_with_pos_and_neg_signs'].
                                    format(table_col_name, ' and '.join(f'\'{friendly_name}\' ({api_name})'
                                                                        for friendly_name, api_name in
                                                                        common_tablenames_to_fields[table_col_name])),
@@ -137,7 +134,8 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
         # Check maximal number of used tables
         if len(common_tablenames_to_fields) > 60:
             query_params = ()
-            raise InvalidUsage(f'Only 60 features are allowed in a single query isntead of {len(used_tables)} !',
+            raise InvalidUsage(settings['ui-strings']['too_mutch_features_specified'].
+                               format(len(used_tables)),
                                status_code=400)
     except InvalidUsage as e:
         exc_tb.append((e.__traceback__, e.message, e.status_code))
@@ -147,7 +145,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
         format_value = request_args.get('format', 'HTML')  # Argument not supplied -> HTML
         if format_value not in POSSIBLE_FORMATS:
             query_params = ()
-            raise InvalidUsage(f'Value ({format_value}) is invalid for FORMAT expected {POSSIBLE_FORMATS} !',
+            raise InvalidUsage(settings['ui-strings']['invalid_format'].format(format_value, POSSIBLE_FORMATS),
                                status_code=400)
         other_params['format'] = format_value
     except InvalidUsage as e:
@@ -179,13 +177,13 @@ def simple_field(field_state, conds, used_fields, not_fields, is_sort_key):
     # There is value, not a regex, there are all_elems, and still value not in all_elems
     if len(field_state['regex']) == 0 and len(field_state['all_elems']) > 0 and \
             field_state['value'] not in field_state['all_elems']:
-        raise InvalidUsage('Value ({0}) is not in available elems at \'{1}\' ({2})!'.
+        raise InvalidUsage(settings['ui-strings']['invalid_value'].
                            format(field_state['value'], field_state['friendly_name'], field_state['api_name']),
                            status_code=400)
 
     # Regex compiles or not? (ignore empty regex!)
     if len(field_state['regex']) > 0 and valid_re_or_none(field_state['value']) is None:
-        raise InvalidUsage('Value ({0}) is invalid regular expression at \'{1}\' ({2})!'.
+        raise InvalidUsage(settings['ui-strings']['invalid_regex'].
                            format(field_state['value'], field_state['friendly_name'], field_state['api_name']),
                            status_code=400)
 
@@ -205,7 +203,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
 
     # There is feature value, but feature name is empty
     if len(field_state['value']) > 0 and len(field_state['fn_value']) == 0:
-        raise InvalidUsage('Value is not empty ({1}) for empty feature name at \'{1}\' ({2})!'.
+        raise InvalidUsage(settings['ui-strings']['non_empty_value_for_empty_featname'].
                            format(field_state['value'], field_state['friendly_name'], field_state['api_name']),
                            status_code=400)
 
@@ -213,7 +211,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
     if len(field_state['value']) > 0:
         # Regex compiles or not? (ignore empty regex!)
         if len(field_state['regex']) > 0 and valid_re_or_none(field_state['value']) is None:
-            raise InvalidUsage('Value ({0}) is invalid regular expression at \'{1}\' ({2})!'.
+            raise InvalidUsage(settings['ui-strings']['invalid_regex'].
                                format(field_state['value'], field_state['friendly_name'], field_state['api_name']),
                                status_code=400)
         value = field_state['value']
@@ -230,7 +228,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
         if fn_value is not None:
             fn_value = set(fn_value)
         else:  # Invalid regex, ignore field
-            raise InvalidUsage('Feature name value ({0}) is invalid regular expression at \'{1}\' ({2}FEATNAME)!'.
+            raise InvalidUsage(settings['ui-strings']['featname_invalid_regex'].
                                format(field_state['fn_value'], field_state['friendly_name'], field_state['api_name']),
                                status_code=400)
 
@@ -238,7 +236,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
     elif field_state['fn_value'] in field_state['all_featelems']:
         fn_value = {field_state['fn_value']}
     else:
-        raise InvalidUsage('Feature name value ({0}) is not in the selectable list at \'{1}\' ({2}FEATNAME)!'.
+        raise InvalidUsage(settings['ui-strings']['featname_invalid_value'].
                            format(field_state['fn_value'], field_state['friendly_name'], field_state['api_name']),
                            status_code=400)
 
@@ -263,7 +261,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
     #  - len(field_tables) == 0 if field_state['fn_not'] == True and len(field_state['value']) == 0
     #  - Else both variable counts!
     if len(field_tables) + len(not_tables) > 60:
-        raise InvalidUsage('Feature name value ({0}) is too broad regular expression at \'{1}\' ({2}FEATNAME)!'.
+        raise InvalidUsage(settings['ui-strings']['featname_value_too_broad_regex'].
                            format(field_state['fn_value'], field_state['friendly_name'], field_state['api_name']),
                            status_code=400)
     elif len(field_tables) > 0 or len(not_tables) > 0:
@@ -276,8 +274,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
             not_fields[(fn_value, field_state['col_name'])]. \
                 append((field_state['friendly_name'], field_state['api_name']))
     else:
-        raise InvalidUsage('Feature name value ({0}) regular expression does not match any possible value at \'{1}\''
-                           ' ({2}FEATNAME)!'.
+        raise InvalidUsage(settings['ui-strings']['featname_regex_invalid_value'].
                            format(field_state['fn_value'], field_state['friendly_name'], field_state['api_name']),
                            status_code=400)
 
