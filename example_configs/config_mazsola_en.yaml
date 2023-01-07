@@ -1,0 +1,123 @@
+title: Mazsola aszaló
+database_name: mazsola_filtered_5.sqlite3
+excluded_tables: {'mazsola'}
+excluded_columns: {'sent'}
+displayed_column_table_name: mazsola
+displayed_column_name: sent
+
+default:
+    # friendly_name
+    table_name: mazsola
+    col_name: verbstem
+    fn_value: ''
+    featelems_aliases:
+        alany : NOM
+        tárgy : ACC
+        részes : DAT
+        birtokos : DAT
+        alanyeset : NOM
+        tárgyeset : ACC
+        részeseset : DAT
+        birtokoseset : DAT
+        "0" : NOM
+        "-t" : ACC
+        "-nAk": DAT
+        "-bA" : ILL
+        "-bAn" : INE
+        "-bÓl" : ELA
+        "-hOz" : ALL
+        "-nÁl" : ADE
+        "-tÓl" : ABL
+        "-rA" : SUB
+        "-On" : SUP
+        "-rÓl" : DEL
+        "-vAl" : INS
+        "-vÁ" : FAC
+        "-ként" : FOR
+        "-kor" : TEM
+        "-ért" : CAU
+        "-ig" : TER
+        "-stUl" : SOC
+        "-Ul": ESS
+    fn_not: false
+    fn_regex: false
+    # api_name
+    value: ''
+    not: false
+    regex: false
+    sort_key: false
+    limit: 40
+    radio_tooltip: List results by the selected criteria
+    # field_name_tooltip: Short description of the field
+    not_tooltip: Negative filtering (the value should not appear in results)
+    regex_tooltip: Enable regular expressions
+    featname_not_tooltip: Negative filtering (the value should not appear in results)
+    featname_regex_tooltip: Enable regular expressions
+
+fields:
+    - friendly_name: Verb stem
+      col_name: verbstem
+      api_name: verbstem
+      sort_key: true
+      field_name_tooltip: The verb's stem
+
+    - friendly_name: Argument 1
+      table_name: null
+      col_name: argstem
+      api_name: arg1
+      field_name_tooltip: The lexeme of the argument (first field), grammatical case of argument (second field)
+
+    - friendly_name: Argument 2
+      table_name: null
+      col_name: argstem
+      api_name: arg2
+      field_name_tooltip: The lexeme of the argument (first field), grammatical case of argument (second field)
+
+    - friendly_name: Argument 3
+      table_name: null
+      col_name: argstem
+      api_name: arg3
+      field_name_tooltip: The lexeme of the argument (first field), grammatical case of argument (second field)
+
+    - friendly_name: Argument frame
+      col_name: frame
+      api_name: frame
+      field_name_tooltip: Query the verbs structures by their argument frames (grammatical cases are indicated by their Latin names in alphabetical order)
+
+    - friendly_name: Word/Phrase
+      col_name: sent
+      api_name: sent
+      regex: true
+      field_name_tooltip: The full sentence (Regex option off means that value must match the full sentence)
+
+ui-strings:
+    locale: hu_HU.UTF-8
+    submit: Submit
+    reset: Reset (to last parameters)
+    clear_field_values: Clear all fields
+    n_more_elems: {0} further results were not displayed
+    save_as_tsv: Save results in TSV format
+    save_as_json: Save results in JSON format
+    regex_disabled: Regex is disabled for field {0} ({1}) because it is non-sting type, but regex parameter is checked for field!
+    sort_key_invalid: Sort key (sort) is empty or has invalid value or the selected field has invalid value!
+    featname_in_multiple_fields: Using feat name ({0}) in multiple fields ({1}) is not allowed!
+    same_feature_with_pos_and_neg_signs: Using the same feature ({0}) with positive and negative signs in multiple fields ({1}) is not allowed!
+    too_mutch_features_specified: Only 60 features are allowed in a single query isntead of {0} !
+    featname_value_too_broad_regex: Feature name value ({0}) is too broad regular expression at \'{1}\' ({2}FEATNAME)!
+    invalid_format: Value ({0}) is invalid for FORMAT expected {1} !
+    invalid_value: Value ({0}) is not in available elems at \'{1}\' ({2})!
+    featname_invalid_value: Feature name value ({0}) is not in the selectable list at \'{1}\' ({2}FEATNAME)!
+    invalid_regex: Value ({0}) is invalid regular expression at \'{1}\' ({2})!
+    featname_invalid_regex: Feature name value ({0}) is invalid regular expression at \'{1}\' ({2}FEATNAME)!
+    non_empty_value_for_empty_featname: Value is not empty ({0}) for empty feature name at \'{1}\' ({2})!
+    featname_regex_invalid_value: Feature name value ({0}) regular expression does not match any possible value at \'{ 1 }\' ({2}FEATNAME)!
+    footer: Database:\ Sass Bálint – <a href="http://corpus.nytud.hu/isz">28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet</a><br>
+            Web front end:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
+            Web front end's idea is based on:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>
+            <br><br>
+            Reporing errors:\ <a href="https://bit.ly/aszalohibajelento">https://bit.ly/aszalohibajelento</a><br>
+            <br>
+            <p>If the database is used, the following publication should be cited:</p>
+            <ul>
+                <li><a href="http://corpus.nytud.hu/isz/">Sass Bálint:\ 28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet. In:\ Tanács Attila, Varga Viktor, Vincze Veronika (szerk.):\ MSZNY 2015, XI. Magyar Számítógépes Nyelvészeti Konferencia, SZTE, Szeged, 2015, 303-308.</a></li>
+            </ul>
