@@ -118,7 +118,7 @@ request.environ.pop('HTTP_X_PROXY_REMOTE_USER', None)
 def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
     """INFO: https://fastapi.tiangolo.com/advanced/security/http-basic-auth/"""
     if credentials.username in users and \
-        compare_digest(users.get(credentials.password), credentials.username):
+        compare_digest(users.get(credentials.username), credentials.password):
         return credentials.username
 
     raise HTTPException(

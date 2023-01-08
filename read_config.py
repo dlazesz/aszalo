@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8, vim: expandtab:ts=4 -*-
 
-import os
 import sys
+from pathlib import Path
 from copy import deepcopy
 from locale import setlocale, LC_ALL
 from re import compile as re_compile, error as re_error
@@ -19,16 +19,6 @@ class Set(Validator):
         return isinstance(value, dict) and set(value.values()) == {None}
 
 
-def load_schema():
-    validators = DefaultValidators.copy()  # This is a dictionary
-    validators[Set.tag] = Set
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config_schema.yaml'), encoding='UTF-8') as fh:
-        schemafile_content = fh.read()
-    config_schema = make_schema(content=schemafile_content, validators=validators)
-
-    return config_schema
-
-
 def valid_re_or_none(re_str):
     try:
         regex = re_compile(re_str)
@@ -37,12 +27,17 @@ def valid_re_or_none(re_str):
     return regex
 
 
-def load_and_validate(schema, fname, strict=True):
-    with open(fname, encoding='UTF-8') as data_fh:
-        data_content = data_fh.read()
-    data = make_data(content=data_content)
+def load_and_validate(schema_fname, fname, strict=True):
+
+    # Load schema and data
+    validators = DefaultValidators.copy()  # This is a dictionary
+    validators[Set.tag] = Set
+    config_schema = make_schema(schema_fname, validators=validators)
+    data = make_data(fname)
+
+    # Validate
     try:
-        validate(schema, data, strict)
+        validate(config_schema, data, strict)
     except YamaleError as e:
         for result in e.results:
             print('Error validating data {0} with {1}:'.format(result.data, result.schema), file=sys.stderr)
@@ -54,8 +49,7 @@ def load_and_validate(schema, fname, strict=True):
 
 def read_config(conf_file):
 
-    config_schema = load_schema()
-    config = load_and_validate(config_schema, conf_file)
+    config = load_and_validate(Path(__file__).parent / 'config_schema.yaml', conf_file)
     setlocale(LC_ALL, config['ui-strings']['locale'])
     # Escape string for HTML
     config['ui-strings']['footer'] = config['ui-strings']['footer'].replace(r':\ ', ': ')
