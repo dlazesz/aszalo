@@ -14,6 +14,7 @@ non_word = re.compile(r'^\W+$')
 
 
 def parse_mazsola(inp_file):
+    quirks = {'közöt': 'között'}
     with ZipFile(inp_file) as mazsola_zip:
         with mazsola_zip.open('mazsola_adatbazis.txt') as mazsola_txt:
             for line in iterdecode(mazsola_txt, 'latin2'):
@@ -24,6 +25,7 @@ def parse_mazsola(inp_file):
                     args = {}
                     for arg in line[ind:].split():
                         case, stem = arg.split('@@')
+                        case = quirks.get(case, case)
                         if case not in args:
                             args[case] = stem
                         else:

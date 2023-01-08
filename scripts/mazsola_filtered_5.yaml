@@ -106,7 +106,6 @@ columns:
     - column_name: KÖZIBE
     - column_name: KÖZT
     - column_name: KÖZÉ
-    - column_name: KÖZÖT
     - column_name: KÖZÖTT
     - column_name: KÖZÜL
     - column_name: ME3
