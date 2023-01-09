@@ -102,7 +102,10 @@ def gen_mazsola_tsv_rows(mazsola, header_keys):
             else:
                 new_args[case] = val
 
-        new_args['frame'] = ' '.join(sorted(case for case in new_args.keys() if case != 'STEM'))
+        frame = ' '.join(sorted(case for case in new_args.keys() if case != 'STEM'))
+        if len(frame) == 0:
+            frame = 'NULL'
+        new_args['frame'] = frame
         new_args['sent'] = sent
 
         yield [new_args.get(elem, 'NULL') for elem in header_keys]  # NULL is the value of missing fields

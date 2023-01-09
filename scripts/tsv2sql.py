@@ -8,7 +8,7 @@ from copy import deepcopy
 from argparse import ArgumentParser, FileType
 
 from yamale import make_schema, make_data, validate, YamaleError
-from sqlalchemy import create_engine, MetaData, Table, Column, ForeignKey, String, Integer, Float
+from sqlalchemy import create_engine, MetaData, Table, Column, ForeignKey, String, Integer, Float, text
 
 col_types_to_sql_types = {'str': (str, String), 'int': (int, Integer), 'float': (float, Float), 'none': (None, None)}
 
@@ -35,6 +35,7 @@ def check_config_and_header(header, config):
     has_main_table_col = False
     col_names, sep_sql_col_names, main_sql_col_names = set(), set(), []
     main_sql_table_names, sep_sql_table_names, sep_col_types = set(), set(), set()
+    main_sql_table_name = None
 
     # Overlay config
     default = config['default']
@@ -91,7 +92,8 @@ def check_config_and_header(header, config):
             sep_col_types.add(column_type)
         else:
             main_sql_col_names.append(sql_col_name)
-            main_sql_table_names.add(sql_table_name.upper())  # Uppercase for comparison
+            main_sql_table_names.add(sql_table_name)
+            main_sql_table_name = sql_table_name
 
         # Add checked columns to the list possibly in random order (with the help of the look-up table)
         new_columns[column_no] = \
@@ -117,14 +119,14 @@ def check_config_and_header(header, config):
 
     if len(main_sql_table_names) != 1:
         raise ValueError(f'The main table\'s name ({", ".join(main_sql_table_names)}) must be the same'
-                         f' for all non-separate column names !')
+                         f' (case sensitive) for all non-separate column names !')
 
     # Table names must be unique
-    if len(sep_sql_table_names & main_sql_table_names) > 0:
-        raise ValueError(f'The main table\'s name ({", ".join(main_sql_table_names)}) must differ from'
+    if main_sql_table_name in sep_sql_table_names:
+        raise ValueError(f'The main table\'s name ({main_sql_table_name}) must differ from'
                          f' the separate column names ({", ".join(sep_sql_table_names)}) !')
 
-    return main_sql_table_names.pop(), new_columns
+    return main_sql_table_name, new_columns
 
 
 def create_tables(engine, main_table_name, cols):
@@ -205,21 +207,15 @@ def tsv2sql(in_file, out_db, config, chunksize=100000):
 
             print(i*chunksize, flush=True)
         print('VACUUM-ing...', flush=True)
-        conn.execute('VACUUM;')
+        conn.execute(text('VACUUM;'))
 
 
-def load_and_validate(schema_fname, inp_data, strict=True):
-    with open(schema_fname, encoding='UTF-8') as fh:
-        schemafile_content = fh.read()
-    config_schema = make_schema(content=schemafile_content)
+def load_and_validate(schema_fname, fname, strict=True):
+    # Load schema and data
+    config_schema = make_schema(schema_fname)
+    data = make_data(fname)
 
-    if isinstance(inp_data, (str, Path)):
-        with open(inp_data, encoding='UTF-8') as fh:
-            inp_data_str = fh.read()
-    else:
-        inp_data_str = inp_data.read()
-    data = make_data(content=inp_data_str)
-
+    # Validate
     try:
         validate(config_schema, data, strict)
     except YamaleError as e:
@@ -237,7 +233,7 @@ def parse_args():
                         help='Input file (cool_data.tsv or STDIN)', metavar='COOL_DATA.TSV', default=sys.stdin)
     parser.add_argument('-o', '--output', dest='output_file', required=True,
                         help='Output SQLite db filename (cool_data.sqlite3)', metavar='COOL_DATA.SQLITE3')
-    parser.add_argument('-c', '--config', dest='config', required=True, type=FileType(encoding='UTF-8'),
+    parser.add_argument('-c', '--config', dest='config', required=True, type=Path,
                         help='The config file defines the database schema', metavar='SCHEMA_DEF.YAML')
     options = vars(parser.parse_args())
 
@@ -248,7 +244,6 @@ def main():
     opts = parse_args()
     config_schema = Path(__file__).parent / 'tsv2sql_config_schema.yaml'
     config = load_and_validate(config_schema, opts['config'])
-    opts['config'].close()  # Because argparse opened it in FileType()
     tsv2sql(opts['input_file'], opts['output_file'], config)
     opts['input_file'].close()  # Because argparse opened it in FileType()
 
