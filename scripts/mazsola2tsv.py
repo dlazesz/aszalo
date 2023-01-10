@@ -11,10 +11,9 @@ from argparse import ArgumentParser, ArgumentTypeError, FileType
 
 log = open('re.log', 'w', encoding='UTf-8')
 non_word = re.compile(r'^\W+$')
-
+quirks = {'közöt': 'között'}
 
 def parse_mazsola(inp_file):
-    quirks = {'közöt': 'között'}
     with ZipFile(inp_file) as mazsola_zip:
         with mazsola_zip.open('mazsola_adatbazis.txt') as mazsola_txt:
             for line in iterdecode(mazsola_txt, 'latin2'):
@@ -25,7 +24,6 @@ def parse_mazsola(inp_file):
                     args = {}
                     for arg in line[ind:].split():
                         case, stem = arg.split('@@')
-                        case = quirks.get(case, case)
                         if case not in args:
                             args[case] = stem
                         else:
@@ -55,6 +53,7 @@ def filter_mazsola_entry(sent, args, sents):
 def normalize_argframe(args):
     ret = {}
     for case, arg_stem in args.items():
+        case = quirks.get(case, case)
         case = case.strip('.').replace('}', '').replace('--', '-').upper()  # Due to bad tokenisation?
         if case not in ret:
             ret[case] = arg_stem
