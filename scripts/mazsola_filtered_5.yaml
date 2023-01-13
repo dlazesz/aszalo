@@ -15,7 +15,7 @@ default:
 columns:
     - column_name: STEM
       table_name: mazsola
-      sql_column_name: stem
+      sql_column_name: verbstem
       index: true
       separate: false
     - column_name: frame

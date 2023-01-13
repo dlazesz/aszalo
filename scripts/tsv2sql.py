@@ -34,7 +34,7 @@ def check_config_and_header(header, config):
     # Init helpers
     has_main_table_col = False
     col_names, sep_sql_col_names, main_sql_col_names = set(), set(), []
-    main_sql_table_names, sep_sql_table_names, sep_col_types = set(), set(), set()
+    main_sql_table_names, main_sql_table_names_upper, sep_sql_table_names, sep_col_types = set(), set(), set(), set()
     main_sql_table_name = None
 
     # Overlay config
@@ -88,11 +88,12 @@ def check_config_and_header(header, config):
 
         if separate:
             sep_sql_col_names.add(sql_col_name)
-            sep_sql_table_names.add(sql_table_name)
+            sep_sql_table_names.add(sql_table_name.upper())
             sep_col_types.add(column_type)
         else:
             main_sql_col_names.append(sql_col_name)
             main_sql_table_names.add(sql_table_name)
+            main_sql_table_names_upper.add(sql_table_name.upper())
             main_sql_table_name = sql_table_name
 
         # Add checked columns to the list possibly in random order (with the help of the look-up table)
@@ -117,12 +118,12 @@ def check_config_and_header(header, config):
         raise ValueError(f'sql_column_name must be uniq for every non-separate column'
                          f' ({", ".join(main_sql_col_names)}) !')
 
-    if len(main_sql_table_names) != 1:
+    if len(main_sql_table_names_upper) != 1:
         raise ValueError(f'The main table\'s name ({", ".join(main_sql_table_names)}) must be the same'
                          f' (case sensitive) for all non-separate column names !')
 
     # Table names must be unique
-    if main_sql_table_name in sep_sql_table_names:
+    if len(main_sql_table_names_upper & sep_sql_table_names) > 0:
         raise ValueError(f'The main table\'s name ({main_sql_table_name}) must differ from'
                          f' the separate column names ({", ".join(sep_sql_table_names)}) !')
 
