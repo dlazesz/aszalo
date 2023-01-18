@@ -104,13 +104,13 @@ ui-strings:
     same_feature_with_pos_and_neg_signs: Ugyanazon jellemző ({0}) pozitív és negatív előjellel történő használata több mezőben ({1}) nem megengedett!
     too_mutch_features_specified: Egy lekérdezésben csak 60 jellemző megengedett {0} helyett !
     invalid_format: A FORMAT paraméter értéke ({0}) érvénytelen (lehetséges értékek:\ {1} ) !
-    featname_value_too_broad_regex: A {1} mezőben jellemzőnév értéke ({0}) túl tág reguláris kifejezés !
-    invalid_value: A {1} mező értéke ({0}) nincs az elérhető elemek között!
-    featname_invalid_value: A {1} mező jellemzőnevének értéke ({0}) nem szerepel az elérhető elemek között!
-    invalid_regex: A {1} mezőben megadott érték ({0}) érvénytelen reguláris kifejezés!
-    featname_invalid_regex: A {1} mezőben megadott jellemzőnév értéke ({0}) érvénytelen reguláris kifejezés !
-    non_empty_value_for_empty_featname: A {1} mezőben megadott érték nem lehet üres ({0}) üres jellemzőnév mellett!
-    featname_regex_invalid_value: A {1} mezőben megadott jellemzőnév értéke ({0}) reguláris kifejezés, de nem illeszkedik egy elérhető értékre sem!
+    featname_value_too_broad_regex: A(z) {1} mezőben jellemzőnév értéke ({0}) túl tág reguláris kifejezés !
+    invalid_value: A(z) {1} mező értéke ({0}) nincs az elérhető elemek között!
+    featname_invalid_value: A(z) {1} mező jellemzőnevének értéke ({0}) nem szerepel az elérhető elemek között!
+    invalid_regex: A(z) {1} mezőben megadott érték ({0}) érvénytelen reguláris kifejezés!
+    featname_invalid_regex: A(z) {1} mezőben megadott jellemzőnév értéke ({0}) érvénytelen reguláris kifejezés !
+    non_empty_value_for_empty_featname: A(z) {1} mezőben megadott érték nem lehet üres ({0}) üres jellemzőnév mellett!
+    featname_regex_invalid_value: A(z) {1} mezőben megadott jellemzőnév értéke ({0}) reguláris kifejezés, de nem illeszkedik egy elérhető értékre sem!
     footer: Adatbázis:\ Sass Bálint – <a href="http://corpus.nytud.hu/isz">28 millió szintaktikailag elemzett mondat és 500000 igei szerkezet</a><br>
             Webes keresőfelület:\ Indig Balázs – <a href="https://github.com/dlazesz/aszalo">Aszaló</a><br>
             Mintául szolgált:\ Sass Bálint – <a href="http://corpus.nytud.hu/mazsola/">Mazsola</a><br>

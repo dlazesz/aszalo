@@ -39,7 +39,7 @@ def parse_view(request_args):
             # Regex disabled, still used as parameter
             if len(field_state['regex_disabled']) > 0 and len(field_state['regex']) > 0:
                 raise InvalidUsage(settings['ui-strings']['regex-disabled'].
-                                   format(f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]})'),
+                                   format(f"'{field_state['friendly_name']}' ({field_state['api_name']})"),
                                    status_code=400)
 
             # 1b. Featname value
@@ -106,7 +106,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
                 query_params = ()
                 raise InvalidUsage(settings['ui-strings']['featname_in_multiple_fields'].
                                    format(table_name,
-                                          ', '.join(f'\'{friendly_name}\' ({api_name})'
+                                          ', '.join(f"'{friendly_name}' ({api_name})"
                                            for friendly_name, api_name in v)),
                                    status_code=400)
 
@@ -117,7 +117,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
                 query_params = ()
                 raise InvalidUsage(settings['ui-strings']['featname_in_multiple_fields'].
                                    format(table_name,
-                                          ', '.join(f'\'{friendly_name}\' ({api_name})'
+                                          ', '.join(f"'{friendly_name}' ({api_name})"
                                            for friendly_name, api_name in v)),
                                    status_code=400)
 
@@ -129,7 +129,7 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
                 query_params = ()
                 raise InvalidUsage(settings['ui-strings']['same_feature_with_pos_and_neg_signs'].
                                    format(table_col_name,
-                                          ', '.join(f'\'{friendly_name}\' ({api_name})'
+                                          ', '.join(f"'{friendly_name}' ({api_name})"
                                            for friendly_name, api_name in common_tablenames_to_fields[table_col_name])),
                                    status_code=400)
 
@@ -160,14 +160,14 @@ def check_state(conds, sort_key, used_fields, not_fields, request_args, other_pa
         other_params['limit'] = int(request_args.get('limit', 1000))  # Argument not supplied -> 1000
     except ValueError as e:
         query_params = ()
-        exc_tb.append((e.__traceback__, 'Value ({0}) is invalid for \'limit\' expected 0 or greater integer !'.
+        exc_tb.append((e.__traceback__, "Value ({0}) is invalid for 'limit' expected 0 or greater integer !".
                        format(request_args['limit']), 400))
 
     # page parameter
     try:
         other_params['page'] = int(request_args.get('page', 0))  # Argument not supplied -> 0
     except ValueError as e:
-        exc_tb.append((e.__traceback__, 'Value ({0}) is invalid for \'page\' expected 0 or greater integer !'.
+        exc_tb.append((e.__traceback__, "Value ({0}) is invalid for 'page' expected 0 or greater integer !".
                       format(request_args['page']), 400))
 
     return query_params
@@ -183,14 +183,14 @@ def simple_field(field_state, conds, used_fields, not_fields, is_sort_key):
             field_state['value'] not in field_state['all_elems']:
         raise InvalidUsage(settings['ui-strings']['invalid_value'].
                            format(field_state['value'],
-                                  f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]})'),
+                                  f"'{field_state['friendly_name']}' ({field_state['api_name']})"),
                            status_code=400)
 
     # Regex compiles or not? (ignore empty regex!)
     if len(field_state['regex']) > 0 and valid_re_or_none(field_state['value']) is None:
         raise InvalidUsage(settings['ui-strings']['invalid_regex'].
                            format(field_state['value'],
-                                  f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]})'),
+                                  f"'{field_state['friendly_name']}' ({field_state['api_name']})"),
                            status_code=400)
 
     # Maintain if a field is used (to check multiple usages later)
@@ -211,7 +211,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
     if len(field_state['value']) > 0 and len(field_state['fn_value']) == 0:
         raise InvalidUsage(settings['ui-strings']['non_empty_value_for_empty_featname'].
                            format(field_state['value'],
-                                  f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]})'),
+                                  f"'{field_state['friendly_name']}' ({field_state['api_name']})"),
                            status_code=400)
 
     # Check value
@@ -220,7 +220,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
         if len(field_state['regex']) > 0 and valid_re_or_none(field_state['value']) is None:
             raise InvalidUsage(settings['ui-strings']['invalid_regex'].
                                format(field_state['value'],
-                                      f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]})'),
+                                      f"'{field_state['friendly_name']}' ({field_state['api_name']})"),
                                status_code=400)
         value = field_state['value']
         value_is_not = len(field_state['not']) > 0
@@ -238,7 +238,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
         else:  # Invalid regex, ignore field
             raise InvalidUsage(settings['ui-strings']['featname_invalid_regex'].
                                format(field_state['fn_value'],
-                                      f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]}FEATNAME)'),
+                                      f"'{field_state['friendly_name']}' ({field_state['api_name']}FEATNAME)"),
                                status_code=400)
 
     # Literal or alias tablename for one table (must be one of selectable_tables and aliases)
@@ -247,7 +247,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
     else:
         raise InvalidUsage(settings['ui-strings']['featname_invalid_value'].
                            format(field_state['fn_value'],
-                                  f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]}FEATNAME)'),
+                                  f"'{field_state['friendly_name']}' ({field_state['api_name']}FEATNAME)"),
                            status_code=400)
 
     # Look up aliases (the target values of the aliases are validated at init time)
@@ -273,7 +273,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
     if len(field_tables) + len(not_tables) > 60:
         raise InvalidUsage(settings['ui-strings']['featname_value_too_broad_regex'].
                            format(field_state['fn_value'],
-                                  f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]}FEATNAME)'),
+                                  f"'{field_state['friendly_name']}' ({field_state['api_name']}FEATNAME)"),
                            status_code=400)
     elif len(field_tables) > 0 or len(not_tables) > 0:
         field_state['table_name'] = frozenset(field_tables)
@@ -287,7 +287,7 @@ def complex_field(field_state, conds, used_fields, not_fields, is_sort_key):
     else:
         raise InvalidUsage(settings['ui-strings']['featname_regex_invalid_value'].
                            format(field_state['fn_value'],
-                                  f'\'{field_state["friendly_name"]}\' ({field_state["api_name"]}FEATNAME)'),
+                                  f"'{field_state['friendly_name']}' ({field_state['api_name']}FEATNAME)"),
                            status_code=400)
 
     # The valid value + fn_value pairs will be OR-ed together while different cond groups will be AND-ed!
