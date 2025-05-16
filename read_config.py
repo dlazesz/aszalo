@@ -104,7 +104,7 @@ def read_config(conf_file):
     config['default_sort_key'] = sort_keys[0]
 
     config['fields'] = new_fields
-    config['database_uri'] = 'sqlite:///{0}'.format(config['database_name'])
+    config['database_uri'] = 'sqlite:///file:{0}?mode=ro&immutable=1&uri=true'.format(config['database_name'])
 
     return config
 

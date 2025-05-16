@@ -24,7 +24,7 @@ settings = read_config(CONFIG_FILE_PATH)
 
 app = FastAPI(title='aszalo')
 
-engine = create_engine(settings['database_uri'], connect_args={'check_same_thread': False}, echo=False)
+engine = create_engine(settings['database_uri'], connect_args={'check_same_thread': False, "uri": True}, echo=False)
 SessionLocal = sessionmaker(autoflush=False, bind=engine)
 
 @contextmanager
